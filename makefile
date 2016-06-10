@@ -15,6 +15,9 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							debug.c							\
 							blink.c							\
 							command.c						\
+							util.c							\
+							calendar.c						\
+
 
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS
@@ -46,7 +49,8 @@ PROJECT_SOURCE			+=	misc.c                       \
 							stm32f4xx_gpio.c             \
 							stm32f4xx_rcc.c              \
 							stm32f4xx_usart.c            \
-#							stm32f4xx_rtc.c              \
+							stm32f4xx_rtc.c              \
+							stm32f4xx_pwr.c              \
 #							stm32f4xx_tim.c              \
 #							stm32f4xx_adc.c              \
 #							stm32f4xx_can.c              \
@@ -71,7 +75,6 @@ PROJECT_SOURCE			+=	misc.c                       \
 #							stm32f4xx_hash_sha1.c        \
 #							stm32f4xx_iwdg.c             \
 #							stm32f4xx_ltdc.c             \
-#							stm32f4xx_pwr.c              \
 #							stm32f4xx_qspi.c             \
 #							stm32f4xx_rng.c              \
 #							stm32f4xx_sai.c              \
