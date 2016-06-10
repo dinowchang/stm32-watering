@@ -16,15 +16,16 @@
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include "config.h"
+#include "gitversion.h"
 #include "assert.h"
 #include "type.h"
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
+#include "FreeRTOS_CLI.h"
 #include "task.h"
 #include "command.h"
 #include "debug.h"
 #include "debug.h"
-#include "FreeRTOS_CLI.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -37,13 +38,14 @@
 #define DBG_COMM							TRUE
 
 #define CHAR_ASCII_DEL						( 0x7F ) 							// DEL acts as a backspace.
+#define CHAR_ASCII_ESC						( 0x1B ) 							// ESCAPE Key
 
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
 QueueHandle_t xCommandQueue;
-static const char * const pcWelcomeMessage = "FreeRTOS command server.\r\nType Help to view a list of registered commands.\r\n\r\n>";
-static const char * const pcEndOfOutputMessage = "\r\n[Press ENTER to execute the previous command again]\r\n>";
+static const char * const pcWelcomeMessage = "FreeRTOS command server.\nType Help to view a list of registered commands.\n\n>";
+static const char * const pcEndOfOutputMessage = "\n[Press ENTER to execute the previous command again]\n[Press UP ARROW to show the previous command]\n>";
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,11 +59,14 @@ static void COMM_Task( void *pvParameters )
 {
 	char data;
 	uint8_t inputIndex = 0;
+	uint8_t controlModeIndex = 0;
 	static char inputString[MAX_INPUT_SIZE], lastInputString[MAX_INPUT_SIZE];
 	char *outputString;
 	BaseType_t ret;
 
 	outputString = FreeRTOS_CLIGetOutputBuffer();
+	DEBUG_printf(DBG_COMM, "\nBuild on %s at %s. ", __DATE__, __TIME__);
+	DEBUG_printf(DBG_COMM, "Git Version : %s\n", GIT_VERSION);
 	DEBUG_printf(DBG_COMM, "%s", pcWelcomeMessage);
 	fflush(stdout);
 
@@ -95,6 +100,41 @@ static void COMM_Task( void *pvParameters )
 
 			DEBUG_printf(DBG_COMM, "%s", pcEndOfOutputMessage);
 			fflush(stdout);
+
+		}
+		else if (data == CHAR_ASCII_ESC)
+		{
+			controlModeIndex = 1;
+		}
+		else if (controlModeIndex != 0)
+		{
+			if( controlModeIndex == 1 )
+			{
+				if (data == '[')
+					controlModeIndex = 2;
+				else
+					controlModeIndex = 0;
+			}
+			else if( controlModeIndex == 2 )
+			{
+				if (data == 'A') // UP ARROR KEY: Show last command
+				{
+					while(inputIndex > 0)
+					{
+						inputIndex--;
+						inputString[inputIndex] = '\0';
+						DEBUG_printf(DBG_COMM, "\b \b");
+						fflush(stdout);
+					}
+					strcpy(inputString, lastInputString);
+					DEBUG_printf(DBG_COMM, "%s", inputString);
+					inputIndex = strlen(inputString);
+					fflush(stdout);
+				}
+				controlModeIndex = 0;
+			}
+			else
+				controlModeIndex = 0;
 
 		}
 		else if ((data == '\b') || (data == CHAR_ASCII_DEL))
@@ -173,7 +213,7 @@ static BaseType_t prvTaskStatsCommand(char *pcWriteBuffer, size_t xWriteBufferLe
 static const CLI_Command_Definition_t xTaskStats =
 {
 	"task-stats", /* The command string to type. */
-	"task-stats:\r\n Displays a table showing the state of each FreeRTOS task\r\n",
+	"task-stats:\n    Displays a table showing the state of each FreeRTOS task\n",
 	prvTaskStatsCommand, /* The function to run. */
 	0 /* No parameters are expected. */
 };

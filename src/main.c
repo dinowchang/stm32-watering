@@ -15,7 +15,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "config.h"
-#include "gitversion.h"
 #include "type.h"
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
@@ -43,20 +42,18 @@ void Delay(__IO uint32_t nTime);
   */
 int main(void)
 {
+	// Initialize system
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
+	// Initialize system and drivers
 	DEBUG_Init();
-	DEBUG_printf(DBG_SYSINFO, "\n\nBuild on %s at %s\n", __DATE__, __TIME__);
-	DEBUG_printf(DBG_SYSINFO, "Git Version : %s\n", GIT_VERSION);
-	DEBUG_printf(DBG_SYSINFO, "System clock = %ld Hz\n", SystemCoreClock);
-
 	Blink_Init();
 	COMM_Init();
 
-	/* Start the scheduler. */
+	// Start the scheduler
 	vTaskStartScheduler();
 
-	/* Infinite loop */
+	// Infinite loop
 	while (1)
 	{
 	}
