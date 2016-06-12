@@ -73,6 +73,15 @@
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
+
+/**
+ * @brief Show RTC time
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
+
 static BaseType_t CALENDAR_GetTimeCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	RTC_TimeTypeDef RTC_TimeStruct;
@@ -91,6 +100,13 @@ static const CLI_Command_Definition_t xCalendarGetTime =
 	0 /* No parameters are expected. */
 };
 
+/**
+ * @brief Set RTC time
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
 static BaseType_t CALENDAR_SetTimeCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	uint32_t hours, minutes, seconds;
@@ -137,6 +153,41 @@ static const CLI_Command_Definition_t xCalendarSetTime =
 	3 /* No parameters are expected. */
 };
 
+/**
+ * @brief Show alarm
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
+static BaseType_t CALENDAR_GetAlarmCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	RTC_AlarmTypeDef RTC_AlarmStruct;
+	RTC_GetAlarm(RTC_Format_BIN, RTC_Alarm_A, &RTC_AlarmStruct);
+
+	sprintf(pcWriteBuffer, "System Time: %02d:%02d:%02d\n",
+			RTC_AlarmStruct.RTC_AlarmTime.RTC_Hours, RTC_AlarmStruct.RTC_AlarmTime.RTC_Minutes,
+			RTC_AlarmStruct.RTC_AlarmTime.RTC_Seconds);
+
+	return pdFALSE;
+
+}
+
+static const CLI_Command_Definition_t xCalendarGetAlarm =
+{
+	"get_alarm", /* The command string to type. */
+	"get_alarm:\n    Displays alarm time of system\n",
+	CALENDAR_GetAlarmCommand, /* The function to run. */
+	0 /* No parameters are expected. */
+};
+
+/**
+ * @brief set alarm
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
 static BaseType_t CALENDAR_SetAlarmCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	RTC_AlarmCmd(RTC_Alarm_A, DISABLE);
@@ -193,6 +244,9 @@ static const CLI_Command_Definition_t xCalendarSetAlarm =
 	3 /* No parameters are expected. */
 };
 
+/**
+ * @brief set sysclock , same to SetSysClock() in system_stm32f4xx.c
+ */
 static void RecoverSysClock(void)
 {
 
@@ -413,6 +467,13 @@ static void RecoverSysClock(void)
 
 }
 
+/**
+ * @brief force system to enter stop mode
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
 static BaseType_t CALENDAR_SleepCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	RTC_TimeTypeDef RTC_SleepTime, RTC_WakeupTime;
@@ -449,6 +510,9 @@ static const CLI_Command_Definition_t xCalendarSleep =
 
 };
 
+/**
+ * @brief Initialize RTC
+ */
 void CALENDAR_Init(void)
 {
 	// Enable the PWR clock
@@ -501,11 +565,14 @@ void CALENDAR_Init(void)
 
 	FreeRTOS_CLIRegisterCommand( &xCalendarGetTime );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSetTime );
+	FreeRTOS_CLIRegisterCommand( &xCalendarGetAlarm );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSetAlarm );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSleep );
-
 }
 
+/**
+ * @brief IRQ handler of RTC alarm
+ */
 void RTC_Alarm_IRQHandler(void)
 {
 	if ( EXTI_GetITStatus(EXTI_Line17) )
