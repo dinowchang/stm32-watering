@@ -46,11 +46,12 @@ VPATH					+=  $(TOP)/lib/STM32F4xx_StdPeriph_Driver/src
 PROJECT_INC_PATHS		+=	-I$(TOP)/lib/STM32F4xx_StdPeriph_Driver/inc
 
 PROJECT_SOURCE			+=	misc.c                       \
+							stm32f4xx_exti.c             \
 							stm32f4xx_gpio.c             \
-							stm32f4xx_rcc.c              \
-							stm32f4xx_usart.c            \
-							stm32f4xx_rtc.c              \
 							stm32f4xx_pwr.c              \
+							stm32f4xx_rcc.c              \
+							stm32f4xx_rtc.c              \
+							stm32f4xx_usart.c            \
 #							stm32f4xx_tim.c              \
 #							stm32f4xx_adc.c              \
 #							stm32f4xx_can.c              \
@@ -65,7 +66,6 @@ PROJECT_SOURCE			+=	misc.c                       \
 #							stm32f4xx_dcmi.c             \
 #							stm32f4xx_dma.c              \
 #							stm32f4xx_dma2d.c            \
-#							stm32f4xx_exti.c             \
 #							stm32f4xx_flash.c            \
 #							stm32f4xx_flash_ramfunc.c    \
 #							stm32f4xx_fmpi2c.c           \
@@ -102,9 +102,9 @@ PROJECT_OPENOCD_CONFIG = board/st_nucleo_f4.cfg
 sinclude $(TOP)/common.mk
 
 # Force to update the builded time in main.c
-obj/main.o : force
+obj/command.o : force
 
-obj/main.c.d : inc/gitversion.h
+obj/command.c.d : inc/gitversion.h
 
 inc/gitversion.h: .git/HEAD .git/index
 	@echo -e "#define GIT_VERSION\t\t\"$(shell git rev-parse --short HEAD)\"" > $@
