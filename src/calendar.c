@@ -511,6 +511,42 @@ static const CLI_Command_Definition_t xCalendarSleep =
 };
 
 /**
+ * @brief start RTC calibration mode
+ * @param pcWriteBuffer
+ * @param xWriteBufferLen
+ * @param pcCommandString
+ * @return
+ */
+static BaseType_t CALENDAR_RtcCalibrationCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	// Enable clock of GPIOC
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+
+	// Configure pins PC13 to RTC_AF1
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// Enable RTC 1HZ clock output
+	RTC_CalibOutputConfig(RTC_CalibOutput_1Hz);
+	RTC_CalibOutputCmd(ENABLE);
+
+	return pdFALSE;
+}
+
+static const CLI_Command_Definition_t xRtcCalibration =
+{
+	"rtc_cal", /* The command string to type. */
+	"rtc_cal:\n    enter RTC calibration mode\n",
+	CALENDAR_RtcCalibrationCommand, /* The function to run. */
+	0 /* No parameters are expected. */
+};
+
+/**
  * @brief Initialize RTC
  */
 void CALENDAR_Init(void)
@@ -521,22 +557,23 @@ void CALENDAR_Init(void)
 	// Allow access to RTC
 	PWR_BackupAccessCmd(ENABLE);
 
-	/* Reset RTC Domain */
+	// Reset RTC Domain
 	RCC_BackupResetCmd(ENABLE);
 	RCC_BackupResetCmd(DISABLE);
 
-	/* Enable the LSE OSC */
+	// Enable the LSE OSC
 	RCC_LSEConfig(RCC_LSE_ON);
 
-	/* Wait until LSE is ready */
+	// Wait until LSE is ready
 	while (RCC_GetFlagStatus(RCC_FLAG_LSERDY) == RESET);
 
-	/* Enable RTC Clock */
-	RCC_RTCCLKCmd(ENABLE);
-
-	/* Select the RTC Clock Source */
+	// Select the RTC Clock Source
 	RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);
 
+	// Enable RTC Clock
+	RCC_RTCCLKCmd(ENABLE);
+
+	// Configure RTC Clock divider
     RTC_InitTypeDef RTC_InitStructure;
     RTC_StructInit(&RTC_InitStructure);
     RTC_Init(&RTC_InitStructure);
@@ -544,7 +581,7 @@ void CALENDAR_Init(void)
     // Enable SYSCFG clock for EXTI
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-    /* Configure EXTI Line 17 for RTC_Alarm */
+    // Configure EXTI Line 17 for RTC_Alarm
 	EXTI_InitTypeDef EXTI_InitStruct;
 	EXTI_StructInit(&EXTI_InitStruct);
 	EXTI_InitStruct.EXTI_Line = EXTI_Line17;
@@ -553,7 +590,7 @@ void CALENDAR_Init(void)
 	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStruct);
 
-	/* Enable the RTC_Alarm interrupt */
+	// Configure NVIC RTC_Alarm interrupt
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = RTC_Alarm_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -561,13 +598,16 @@ void CALENDAR_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
+	// Enable RTC_Alarm interrupt
 	RTC_ITConfig(RTC_IT_ALRA, ENABLE);
 
+	// Register CLI command
 	FreeRTOS_CLIRegisterCommand( &xCalendarGetTime );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSetTime );
 	FreeRTOS_CLIRegisterCommand( &xCalendarGetAlarm );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSetAlarm );
 	FreeRTOS_CLIRegisterCommand( &xCalendarSleep );
+	FreeRTOS_CLIRegisterCommand( &xRtcCalibration );
 }
 
 /**
