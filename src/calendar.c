@@ -519,21 +519,40 @@ static const CLI_Command_Definition_t xCalendarSleep =
  */
 static BaseType_t CALENDAR_RtcCalibrationCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
-	// Enable clock of GPIOC
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+	uint32_t mode;
 
-	// Configure pins PC13 to RTC_AF1
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
+	const char *parameterPtr;
+	int32_t paramterLen;
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	parameterPtr = FreeRTOS_CLIGetParameter(pcCommandString, 1, &paramterLen);
+	mode = DecToInt((char *) parameterPtr, paramterLen);
 
-	// Enable RTC 1HZ clock output
-	RTC_CalibOutputConfig(RTC_CalibOutput_1Hz);
-	RTC_CalibOutputCmd(ENABLE);
+	if( mode == 1 )
+	{
+		// Enable RTC 512Hz clock output
+		RTC_CalibOutputConfig(RTC_CalibOutput_512Hz);
+		RTC_CalibOutputCmd(ENABLE);
+
+		sprintf(pcWriteBuffer, "Enable RTC 512Hz clock output\n");
+		return pdFALSE;
+	}
+	else if( mode == 2 )
+	{
+		// Enable RTC 1Hz clock output
+		RTC_CalibOutputConfig(RTC_CalibOutput_1Hz);
+		RTC_CalibOutputCmd(ENABLE);
+
+		sprintf(pcWriteBuffer, "Enable RTC 512Hz clock output\n");
+		return pdFALSE;
+	}
+	else
+	{
+		// Disable RTC clock output
+		RTC_CalibOutputCmd(DISABLE);
+
+		sprintf(pcWriteBuffer, "Disable RTC clock output\n");
+		return pdFALSE;
+	}
 
 	return pdFALSE;
 }
@@ -541,9 +560,9 @@ static BaseType_t CALENDAR_RtcCalibrationCommand(char *pcWriteBuffer, size_t xWr
 static const CLI_Command_Definition_t xRtcCalibration =
 {
 	"rtc_cal", /* The command string to type. */
-	"rtc_cal:\n    enter RTC calibration mode\n",
+	"rtc_cal <mode>:\n    enter RTC calibration mode 0: off, 1: 512Hz, 2: 1Hz\n",
 	CALENDAR_RtcCalibrationCommand, /* The function to run. */
-	0 /* No parameters are expected. */
+	1 /* No parameters are expected. */
 };
 
 /**
