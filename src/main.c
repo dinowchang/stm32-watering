@@ -23,6 +23,7 @@
 #include "blink.h"
 #include "command.h"
 #include "calendar.h"
+#include "lcd1602.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -51,6 +52,7 @@ int main(void)
 	Blink_Init();
 	COMM_Init();
 	CALENDAR_Init();
+	LCD_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();

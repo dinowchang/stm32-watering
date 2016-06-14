@@ -18,7 +18,7 @@ Function
 Hardware
 --------
  - Nucleo-F446RE ( Cortex-M4 )
- - Arduino LCD Button Shield
+ - [Arduino LCD Keypad Shield](https://www.itead.cc/itead-1602-lcd-shield.html)
  - 12V Solenoid Valve 1/2"
  - Soil Moisture Sensor
  - 2 channel 5V Relay

@@ -1,9 +1,9 @@
 /**
   ******************************************************************************
-  * @file    util.h
-  * @author  Dinow
+  * @file    lcd1602.h
+  * @author  dinow
   * @version V0.0.1
-  * @date    2015-12-06
+  * @date    2016-06-14
   * @brief   
   ******************************************************************************
   * @attention
@@ -13,8 +13,8 @@
   ******************************************************************************
   */
 
-#ifndef __INC_UTIL_H_
-#define __INC_UTIL_H_
+#ifndef __INC_DRIVERS_LCD1602_H_
+#define __INC_DRIVERS_LCD1602_H_
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -25,8 +25,6 @@
 /* Exported macro ------------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
-uint32_t HexToInt(char *str, uint16_t len);
-uint32_t DecToInt(char *str, uint16_t len);
-void udelay(uint32_t us);
+void LCD_Init(void);
 
-#endif /* __INC_UTIL_H_ */
+#endif /* __INC_DRIVERS_LCD1602_H_ */

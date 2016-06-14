@@ -13,8 +13,8 @@
   ******************************************************************************
   */
 
-#ifndef INC_CALENDAR_H_
-#define INC_CALENDAR_H_
+#ifndef __INC_CALENDAR_H_
+#define __INC_CALENDAR_H_
 
 /* Includes ------------------------------------------------------------------*/
 
@@ -27,4 +27,4 @@
 /* Exported functions ------------------------------------------------------- */
 void CALENDAR_Init(void);
 
-#endif /* INC_CALENDAR_H_ */
+#endif /* __INC_CALENDAR_H_ */

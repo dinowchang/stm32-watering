@@ -20,6 +20,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
+#define LOOP_PER_US 61 // Cortex M4 @ 184MHz ( SYSCLK / 3 )
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -76,4 +77,25 @@ uint32_t DecToInt(char *str, uint16_t len)
 		len--;
 	}
 	return ret;
+}
+
+
+/**
+ * @brief delay n us
+ * @param uTime
+ */
+void udelay(uint32_t us)
+{
+    uint32_t loopCount = us * LOOP_PER_US;
+    asm volatile //this routine waits (approximately) one millisecond
+    (
+            "mov r3, %[loopCount] \n\t"//load the initial loop counter
+            "delayloop: \n\t"
+            "subs r3, #1 \n\t"
+            "bne delayloop \n\t"
+
+            ://empty output list
+            : [loopCount] "r" (loopCount)//input to the asm routine
+            : "r3", "cc"//clobber list
+    );
 }

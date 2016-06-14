@@ -18,6 +18,12 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							util.c							\
 							calendar.c						\
 
+# Drivers
+VPATH					+=  $(TOP)/src/drivers
+
+PROJECT_INC_PATHS		+=	-I$(TOP)/inc/drivers
+
+PROJECT_SOURCE			+=	lcd1602.c						\
 
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS
