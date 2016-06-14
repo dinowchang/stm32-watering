@@ -25,7 +25,6 @@
 #include "task.h"
 #include "command.h"
 #include "debug.h"
-#include "debug.h"
 
 /* Private typedef -----------------------------------------------------------*/
 

@@ -22,6 +22,7 @@
 #include "debug.h"
 #include "blink.h"
 #include "command.h"
+#include "calendar.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -49,6 +50,7 @@ int main(void)
 	DEBUG_Init();
 	Blink_Init();
 	COMM_Init();
+	CALENDAR_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();
