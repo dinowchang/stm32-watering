@@ -14,8 +14,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "type.h"
 #include "stm32f4xx.h"
+#include "type.h"
 #include "util.h"
 #include "lcd1602.h"
 
@@ -55,50 +55,46 @@
 #define HD44780_CLEAR						0x01
 #define HD44780_HOME						0x02
 #define HD44780_ENTRY_MODE					0x04
-#define HD44780_EM_SHIFT_CURSOR				0
-#define HD44780_EM_SHIFT_DISPLAY			1
-#define HD44780_EM_DECREMENT				0
-#define HD44780_EM_INCREMENT				2
-
-#define HD44780_DISPLAY_ONOFF				0x08
-#define HD44780_DISPLAY_OFF					0
-#define HD44780_DISPLAY_ON					4
-#define HD44780_CURSOR_OFF					0
-#define HD44780_CURSOR_ON					2
-#define HD44780_CURSOR_NOBLINK				0
-#define HD44780_CURSOR_BLINK				1
-
+#define HD44780_DISPLAY_CONTROL				0x08
 #define HD44780_DISPLAY_CURSOR_SHIFT		0x10
-#define HD44780_SHIFT_CURSOR				0
-#define HD44780_SHIFT_DISPLAY				8
-#define HD44780_SHIFT_LEFT					0
-#define HD44780_SHIFT_RIGHT					4
-
 #define HD44780_FUNCTION_SET				0x20
-#define HD44780_FONT5x7						0
-#define HD44780_FONT5x10					4
-#define HD44780_ONE_LINE					0
-#define HD44780_TWO_LINE					8
-#define HD44780_4_BIT						0
-#define HD44780_8_BIT						16
-
 #define HD44780_CGRAM_SET					0x40
-
 #define HD44780_DDRAM_SET					0x80
+
+// Bits definition of entry mode
+#define HD44780_EM_INCREMENT				0x02
+#define HD44780_EM_SHIFT_DISPLAY			0x01
+
+// Bits definition of display on/off control
+#define HD44780_DISPLAY_ON					0x04
+#define HD44780_CURSOR_ON					0x02
+#define HD44780_CURSOR_BLINK				0x01
+
+//Bits definition of cursor/display shift
+#define HD44780_SHIFT_DISPLAY				0x08
+#define HD44780_SHIFT_RIGHT					0x04
+
+//Bits definition of function set
+#define HD44780_8_BIT						0x10
+#define HD44780_FONT5x10					0x04
+#define HD44780_TWO_LINE					0x08
+
 
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+static unsigned char m_EntryMode;
+static unsigned char m_DisplayCtl;
 
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
 
 /**
- * @brief send nibble to LCD in 4bit mode
- * @param nibble
+ * @brief	Send nibble to LCD in 4bit mode
+ * @param	nibble to send
  */
-void LCD_WriteNibble(unsigned char nibble)
+static void LCD_WriteNibble(unsigned char nibble)
 {
 	GPIO_SetBits(LCD_PIN_EN);
 	GPIO_WriteBit(LCD_PIN_DB4, (BitAction) (nibble & BIT0));
@@ -111,10 +107,10 @@ void LCD_WriteNibble(unsigned char nibble)
 }
 
 /**
- * @brief Write instruction
- * @param command
+ * @brief	Write instruction
+ * @param	command
  */
-void LCD_WriteInstruction(unsigned char cmd)
+static void LCD_WriteInstruction(unsigned char cmd)
 {
 	GPIO_ResetBits(LCD_PIN_RS);
 	LCD_WriteNibble(cmd >> 4);
@@ -123,10 +119,10 @@ void LCD_WriteInstruction(unsigned char cmd)
 }
 
 /**
- * @brief Write data
- * @param data
+ * @brief	Write data
+ * @param	data
  */
-void LCD_WriteData(unsigned char data)
+static void LCD_WriteData(unsigned char data)
 {
 	GPIO_SetBits(LCD_PIN_RS);
 	LCD_WriteNibble(data >> 4);
@@ -134,6 +130,39 @@ void LCD_WriteData(unsigned char data)
 	udelay(LCD_INSTRUCTION_DELAY);
 }
 
+/**
+ * @brief	Clears display and returns cursor to the home position (address 0).
+ */
+void LCD_Clear(void)
+{
+	LCD_WriteInstruction(HD44780_CLEAR);
+	udelay(3000);
+}
+
+/**
+ * @brief	Returns cursor to home position.
+ * 			Also returns display being shifted to the original position. DDRAM content remains unchanged.
+ */
+void LCD_Home(void)
+{
+	LCD_WriteInstruction(HD44780_HOME);
+	udelay(3000);
+}
+
+/**
+ * @brief Configure flow of 4bits mode after power on
+ */
+static void LCD_SetTo4BitsMode(void)
+{
+	LCD_WriteNibble(0x03);
+	udelay(LCD_INSTRUCTION_DELAY);
+	LCD_WriteNibble(0x03);
+	udelay(LCD_INSTRUCTION_DELAY);
+	LCD_WriteNibble(0x03);
+	udelay(LCD_INSTRUCTION_DELAY);
+	LCD_WriteNibble(0x02);
+	udelay(LCD_INSTRUCTION_DELAY);
+}
 
 /**
  * @brief Configure gpio and initialize LCD
@@ -168,30 +197,24 @@ void LCD_Init(void)
 	GPIO_ResetBits(LCD_PIN_EN);
 	GPIO_SetBits(LCD_PIN_BL);
 
+	m_EntryMode = HD44780_ENTRY_MODE;
+	m_DisplayCtl = HD44780_DISPLAY_CONTROL;
+
 	// wait 100ms for LCD module boot
 	//udelay(100000);
 
-	// Configure LCD to 4 bit mode
-	LCD_WriteNibble(0x03);
-	udelay(LCD_INSTRUCTION_DELAY);
-	LCD_WriteNibble(0x03);
-	udelay(LCD_INSTRUCTION_DELAY);
-	LCD_WriteNibble(0x03);
-	udelay(LCD_INSTRUCTION_DELAY);
-	LCD_WriteNibble(0x02);
-	udelay(LCD_INSTRUCTION_DELAY);
+	LCD_SetTo4BitsMode();
 
 	LCD_WriteInstruction(0x28);	// set LCD to font 5x7, 2 line
 	LCD_WriteInstruction(0x08); // Disable Display
 
-	LCD_WriteInstruction(0x01); // Clear Display
-	udelay(3000); // delay 3ms
+	LCD_Clear();
 
 	LCD_WriteInstruction(0x06); // set to cursor move mode
 	LCD_WriteInstruction(0x00);
 	LCD_WriteInstruction(0x0f); // Enable display cursor
 
-	LCD_WriteInstruction(0x81); // goto 1, 0
+	//LCD_WriteInstruction(0x81); // goto 1, 0
 	LCD_WriteData('H');
 	LCD_WriteData('e');
 	LCD_WriteData('l');

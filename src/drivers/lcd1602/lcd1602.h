@@ -26,6 +26,8 @@
 
 /* Exported functions ------------------------------------------------------- */
 void LCD_Init(void);
+void LCD_Clear(void);
+void LCD_Home(void);
 
 void LCD_Test(void);
 

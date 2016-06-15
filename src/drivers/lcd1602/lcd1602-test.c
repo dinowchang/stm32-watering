@@ -14,8 +14,6 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "config.h"
-#include "type.h"
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -37,10 +35,10 @@
 /* Private functions ---------------------------------------------------------*/
 
 /**
- * @brief Switch LCD backlight LED
- * @param pcWriteBuffer
- * @param xWriteBufferLen
- * @param pcCommandString
+ * @brief	Switch LCD backlight LED
+ * @param	pcWriteBuffer
+ * @param	xWriteBufferLen
+ * @param	pcCommandString
  * @return
  */
 static BaseType_t LCD_LedCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
@@ -78,14 +76,62 @@ static BaseType_t LCD_LedCommand(char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 static const CLI_Command_Definition_t xLcdLed =
 {
-	"lcd_led", /* The command string to type. */
+	"lcd_led",
 	"lcd_led:\n    Switch LCD backlight LED\n",
-	LCD_LedCommand, /* The function to run. */
-	1 /* No parameters are expected. */
+	LCD_LedCommand,
+	1
 };
 
+/**
+ * @param	pcWriteBuffer
+ * @param	xWriteBufferLen
+ * @param	pcCommandString
+ * @return
+ */
+static BaseType_t LCD_ClearCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	LCD_Clear();
+	sprintf(pcWriteBuffer, "LCD clear display\n"); // Clean Message
+	return pdFALSE;
+
+}
+
+static const CLI_Command_Definition_t xLcdClear =
+{
+	"lcd_clear",
+	"lcd_clear:\n    Clear display\n",
+	LCD_ClearCommand,
+	0
+};
+
+/**
+ * @param	pcWriteBuffer
+ * @param	xWriteBufferLen
+ * @param	pcCommandString
+ * @return
+ */
+static BaseType_t LCD_HomeCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	LCD_Home();
+	sprintf(pcWriteBuffer, "LCD move cursor home\n"); // Clean Message
+	return pdFALSE;
+
+}
+
+static const CLI_Command_Definition_t xLcdHome =
+{
+	"lcd_home",
+	"lcd_home:\n    Clear display\n",
+	LCD_HomeCommand,
+	0
+};
+/**
+ * @brief	Register CLI command
+ */
 void LCD_Test(void)
 {
-	// Register CLI command
-	FreeRTOS_CLIRegisterCommand( &xLcdLed );
+	FreeRTOS_CLIRegisterCommand(&xLcdLed);
+	FreeRTOS_CLIRegisterCommand(&xLcdClear);
+	FreeRTOS_CLIRegisterCommand(&xLcdHome);
+
 }
