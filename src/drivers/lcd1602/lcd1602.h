@@ -28,6 +28,10 @@
 void LCD_Init(void);
 void LCD_Clear(void);
 void LCD_Home(void);
+void LCD_Display(FunctionalState newState);
+void LCD_Sleep(FunctionalState newState);
+void LCD_Cursor(FunctionalState newState);
+void LCD_Blink(FunctionalState newState);
 
 void LCD_Test(void);
 

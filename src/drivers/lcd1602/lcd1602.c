@@ -24,8 +24,10 @@
 /* Private define ------------------------------------------------------------*/
 #define SUPPORT_LCD_TEST_COMMAND			1
 
-#define LCD_NIBBLE_DELAY					20
-#define LCD_INSTRUCTION_DELAY				60
+#define LCD_NIBBLE_DELAY					5
+#define LCD_INSTRUCTION_DELAY				40
+#define LCD_INSTRUCTION_LONG_DELAY			(uint32_t)1600
+
 // LCD Pins
 #define LCD_PIN_CLOCK						RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC
 #define LCD_PIN_DB4_PORT					GPIOB
@@ -136,7 +138,7 @@ static void LCD_WriteData(unsigned char data)
 void LCD_Clear(void)
 {
 	LCD_WriteInstruction(HD44780_CLEAR);
-	udelay(3000);
+	udelay(LCD_INSTRUCTION_LONG_DELAY);
 }
 
 /**
@@ -146,8 +148,62 @@ void LCD_Clear(void)
 void LCD_Home(void)
 {
 	LCD_WriteInstruction(HD44780_HOME);
-	udelay(3000);
+	udelay(LCD_INSTRUCTION_LONG_DELAY);
 }
+
+/**
+ * @brief	Control display on/off
+ * @param	newState
+ */
+void LCD_Display(FunctionalState newState)
+{
+	if( newState != DISABLE )
+		m_DisplayCtl |= HD44780_DISPLAY_ON;
+	else
+		m_DisplayCtl &= ~HD44780_DISPLAY_ON;
+
+	LCD_WriteInstruction(m_DisplayCtl);
+}
+
+/**
+ * @brief	Control cursor on/off
+ * @param	newState
+ */
+void LCD_Cursor(FunctionalState newState)
+{
+	if( newState != DISABLE )
+		m_DisplayCtl |= HD44780_CURSOR_ON;
+	else
+		m_DisplayCtl &= ~HD44780_CURSOR_ON;
+
+	LCD_WriteInstruction(m_DisplayCtl);
+}
+
+/**
+ * @brief	Control blink cursor on/off
+ * @param	newState
+ */
+void LCD_Blink(FunctionalState newState)
+{
+	if( newState != DISABLE )
+		m_DisplayCtl |= HD44780_CURSOR_BLINK;
+	else
+		m_DisplayCtl &= ~HD44780_CURSOR_BLINK;
+
+	LCD_WriteInstruction(m_DisplayCtl);
+}
+
+/**
+ * @brief	Control backlight and display on/off
+ * @param	newState
+ */
+void LCD_Sleep(FunctionalState newState)
+{
+	LCD_Display(newState);
+	GPIO_WriteBit(LCD_PIN_BL, (BitAction)newState);
+}
+
+
 
 /**
  * @brief Configure flow of 4bits mode after power on
@@ -200,19 +256,13 @@ void LCD_Init(void)
 	m_EntryMode = HD44780_ENTRY_MODE;
 	m_DisplayCtl = HD44780_DISPLAY_CONTROL;
 
-	// wait 100ms for LCD module boot
-	//udelay(100000);
-
 	LCD_SetTo4BitsMode();
-
-	LCD_WriteInstruction(0x28);	// set LCD to font 5x7, 2 line
-	LCD_WriteInstruction(0x08); // Disable Display
-
+	LCD_WriteInstruction(HD44780_FUNCTION_SET | HD44780_TWO_LINE); // set LCD to font 5x7, 2 line
+	LCD_Display(DISABLE);
 	LCD_Clear();
-
 	LCD_WriteInstruction(0x06); // set to cursor move mode
-	LCD_WriteInstruction(0x00);
-	LCD_WriteInstruction(0x0f); // Enable display cursor
+	//LCD_WriteInstruction(0x00);
+	LCD_Display(ENABLE);
 
 	//LCD_WriteInstruction(0x81); // goto 1, 0
 	LCD_WriteData('H');

@@ -14,7 +14,6 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOS_CLI.h"
@@ -41,7 +40,7 @@
  * @param	pcCommandString
  * @return
  */
-static BaseType_t LCD_LedCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+static BaseType_t LCD_SleepCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	const char *parameterPtr;
 	int32_t paramterLen;
@@ -51,21 +50,20 @@ static BaseType_t LCD_LedCommand(char *pcWriteBuffer, size_t xWriteBufferLen, co
 	if (paramterLen == 1)
 	{
 		if (parameterPtr[0] == '0')
-			GPIO_ResetBits(GPIOB, GPIO_Pin_6);
+			LCD_Sleep(ENABLE);
 		else if (parameterPtr[0] == '1')
-			GPIO_SetBits(GPIOB, GPIO_Pin_6);
-
+			LCD_Sleep(DISABLE);
 	}
 	else if (paramterLen == 2)
 	{
 		if (parameterPtr[0] == 'o' && parameterPtr[1] == 'n')
-			GPIO_SetBits(GPIOB, GPIO_Pin_6);//GPIO_SetBits(LCD_PIN_BL);
+			LCD_Sleep(DISABLE);
 	}
 	else if (paramterLen == 3)
 	{
 		if (parameterPtr[0] == 'o' && parameterPtr[1] == 'f'
 				&& parameterPtr[2] == 'f')
-			GPIO_ResetBits(GPIOB, GPIO_Pin_6);//GPIO_ResetBits(LCD_PIN_BL);
+			LCD_Sleep(ENABLE);
 	}
 
 	sprintf(pcWriteBuffer, "\n"); // Clean Message
@@ -74,11 +72,11 @@ static BaseType_t LCD_LedCommand(char *pcWriteBuffer, size_t xWriteBufferLen, co
 
 }
 
-static const CLI_Command_Definition_t xLcdLed =
+static const CLI_Command_Definition_t xLcdSleep =
 {
-	"lcd_led",
-	"lcd_led:\n    Switch LCD backlight LED\n",
-	LCD_LedCommand,
+	"lcd_sleep",
+	"lcd_sleep <on/off>:\n    Control LCD backlight and display\n",
+	LCD_SleepCommand,
 	1
 };
 
@@ -113,7 +111,7 @@ static const CLI_Command_Definition_t xLcdClear =
 static BaseType_t LCD_HomeCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	LCD_Home();
-	sprintf(pcWriteBuffer, "LCD move cursor home\n"); // Clean Message
+	sprintf(pcWriteBuffer, "LCD move cursor home\n");
 	return pdFALSE;
 
 }
@@ -125,13 +123,46 @@ static const CLI_Command_Definition_t xLcdHome =
 	LCD_HomeCommand,
 	0
 };
+
+/**
+ * @param	pcWriteBuffer
+ * @param	xWriteBufferLen
+ * @param	pcCommandString
+ * @return
+ */
+static BaseType_t LCD_CursorCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	const char *parameterPtr;
+	int32_t paramterLen;
+	uint32_t mode;
+
+	parameterPtr = FreeRTOS_CLIGetParameter(pcCommandString, 1, &paramterLen);
+	mode = DecToInt((char *) parameterPtr, paramterLen);
+
+	LCD_Cursor(mode & BIT0);
+	LCD_Blink(mode & BIT1);
+
+	sprintf(pcWriteBuffer, "Cursor set to mode: %d\n", (uint16_t)(mode & 0x03));
+
+	return pdFALSE;
+
+}
+
+static const CLI_Command_Definition_t xLcdCursor =
+{
+	"lcd_cur",
+	"lcd_cur <mode>:\n    Cursor mode 0~3\n",
+	LCD_CursorCommand,
+	1
+};
+
 /**
  * @brief	Register CLI command
  */
 void LCD_Test(void)
 {
-	FreeRTOS_CLIRegisterCommand(&xLcdLed);
+	FreeRTOS_CLIRegisterCommand(&xLcdSleep);
 	FreeRTOS_CLIRegisterCommand(&xLcdClear);
 	FreeRTOS_CLIRegisterCommand(&xLcdHome);
-
+	FreeRTOS_CLIRegisterCommand(&xLcdCursor);
 }
