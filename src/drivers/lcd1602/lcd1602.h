@@ -27,4 +27,6 @@
 /* Exported functions ------------------------------------------------------- */
 void LCD_Init(void);
 
+void LCD_Test(void);
+
 #endif /* __INC_DRIVERS_LCD1602_H_ */
