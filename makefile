@@ -19,9 +19,8 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							calendar.c						\
 
 # Drivers
-VPATH					+=  $(TOP)/src/drivers
-
-PROJECT_INC_PATHS		+=	-I$(TOP)/inc/drivers
+VPATH					+=  $(TOP)/src/drivers/lcd1602
+PROJECT_INC_PATHS		+=	-I$(TOP)/src/drivers/lcd1602
 
 PROJECT_SOURCE			+=	lcd1602.c						\
 
