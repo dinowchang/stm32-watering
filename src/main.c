@@ -22,6 +22,8 @@
 #include "debug.h"
 #include "blink.h"
 #include "command.h"
+#include "keypad.h"
+
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -49,6 +51,7 @@ int main(void)
 	DEBUG_Init();
 	Blink_Init();
 	COMM_Init();
+	KEY_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();

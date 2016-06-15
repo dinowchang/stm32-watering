@@ -16,6 +16,14 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							blink.c							\
 							command.c						\
 
+# Drivers
+VPATH					+=  $(TOP)/src/drivers
+
+PROJECT_INC_PATHS		+=	-I$(TOP)/inc/drivers			\
+
+PROJECT_SOURCE			+=	keypad.c						\
+
+
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS
 
@@ -43,12 +51,12 @@ VPATH					+=  $(TOP)/lib/STM32F4xx_StdPeriph_Driver/src
 PROJECT_INC_PATHS		+=	-I$(TOP)/lib/STM32F4xx_StdPeriph_Driver/inc
 
 PROJECT_SOURCE			+=	misc.c                       \
+							stm32f4xx_adc.c              \
 							stm32f4xx_gpio.c             \
 							stm32f4xx_rcc.c              \
 							stm32f4xx_usart.c            \
 #							stm32f4xx_rtc.c              \
 #							stm32f4xx_tim.c              \
-#							stm32f4xx_adc.c              \
 #							stm32f4xx_can.c              \
 #							stm32f4xx_cec.c              \
 #							stm32f4xx_crc.c              \
