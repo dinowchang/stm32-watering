@@ -19,8 +19,8 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							calendar.c						\
 
 # LCD1602 driver
-VPATH					+=  $(TOP)/src/drivers/lcd1602
-PROJECT_INC_PATHS		+=	-I$(TOP)/src/drivers/lcd1602
+VPATH					+=  $(TOP)/drv/lcd1602
+PROJECT_INC_PATHS		+=	-I$(TOP)/drv/lcd1602
 PROJECT_SOURCE			+=	lcd1602.c						\
 							lcd1602-test.c
 # FreeRTOS
