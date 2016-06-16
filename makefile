@@ -20,7 +20,7 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 VPATH					+=  $(TOP)/drv/keypad
 PROJECT_INC_PATHS		+=	-I$(TOP)/drv/keypad
 PROJECT_SOURCE			+=	keypad.c						\
-
+							keypad-test.c
 
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS

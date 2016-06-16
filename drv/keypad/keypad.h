@@ -18,8 +18,19 @@
 /* Includes ------------------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
+typedef enum {
+	eKeyNone = 0,
+	eKeyLeft,
+	eKeyRight,
+	eKeyUp,
+	eKeyDown,
+	eKeySelect
+} KeyPadButton;
 
 /* Exported constants --------------------------------------------------------*/
+#define KEY_RIGHT			0
+#define KEY_UP				1
+
 
 /* Exported macro ------------------------------------------------------------*/
 
@@ -27,5 +38,9 @@
 void KEY_Init(void);
 void KEY_Enable(void);
 void KEY_Disable(void);
+uint16_t KEY_GetValue(void);
+KeyPadButton KEY_GetKey(void);
+
+void KEY_Test(void);
 
 #endif /* __INC_DRIVERS_KEYPAD_H_ */
