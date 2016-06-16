@@ -18,6 +18,11 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							util.c							\
 							calendar.c						\
 
+# Soil moisture sensor driver
+VPATH					+=  $(TOP)/src/drivers/soil-moisture
+PROJECT_INC_PATHS		+=	-I$(TOP)/src/drivers/soil-moisture
+PROJECT_SOURCE			+=	soil-moisture.c						\
+							soil-moisture-test.c
 
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS
@@ -46,6 +51,7 @@ VPATH					+=  $(TOP)/lib/STM32F4xx_StdPeriph_Driver/src
 PROJECT_INC_PATHS		+=	-I$(TOP)/lib/STM32F4xx_StdPeriph_Driver/inc
 
 PROJECT_SOURCE			+=	misc.c                       \
+							stm32f4xx_adc.c              \
 							stm32f4xx_exti.c             \
 							stm32f4xx_gpio.c             \
 							stm32f4xx_pwr.c              \
@@ -53,7 +59,6 @@ PROJECT_SOURCE			+=	misc.c                       \
 							stm32f4xx_rtc.c              \
 							stm32f4xx_usart.c            \
 #							stm32f4xx_tim.c              \
-#							stm32f4xx_adc.c              \
 #							stm32f4xx_can.c              \
 #							stm32f4xx_cec.c              \
 #							stm32f4xx_crc.c              \
