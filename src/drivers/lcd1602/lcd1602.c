@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_LCD_TEST_COMMAND			1
+#define SUPPORT_LCD_TEST_COMMAND			1 // debug command for FreeRTOS-CLI
 
 #define LCD_NIBBLE_DELAY					5
 #define LCD_INSTRUCTION_DELAY				40
@@ -124,7 +124,7 @@ static void LCD_WriteInstruction(unsigned char cmd)
  * @brief	Write data
  * @param	data
  */
-static void LCD_WriteData(unsigned char data)
+void LCD_WriteData(unsigned char data)
 {
 	GPIO_SetBits(LCD_PIN_RS);
 	LCD_WriteNibble(data >> 4);
@@ -149,6 +149,34 @@ void LCD_Home(void)
 {
 	LCD_WriteInstruction(HD44780_HOME);
 	udelay(LCD_INSTRUCTION_LONG_DELAY);
+}
+
+/**
+ * @brief	Cursor move direction when write data
+ * @param	newState
+ */
+void LCD_LeftToRightMode(FunctionalState newState)
+{
+	if( newState != DISABLE )
+		m_EntryMode |= HD44780_EM_INCREMENT;
+	else
+		m_EntryMode &= ~HD44780_EM_INCREMENT;
+
+	LCD_WriteInstruction(m_EntryMode);
+}
+
+/**
+ * @brief	Scroll display when write data
+ * @param	newState
+ */
+void LCD_AutoScroll(FunctionalState newState)
+{
+	if( newState != DISABLE )
+		m_EntryMode |= HD44780_EM_SHIFT_DISPLAY;
+	else
+		m_EntryMode &= ~HD44780_EM_SHIFT_DISPLAY;
+
+	LCD_WriteInstruction(m_EntryMode);
 }
 
 /**
@@ -194,6 +222,58 @@ void LCD_Blink(FunctionalState newState)
 }
 
 /**
+ *
+ */
+void LCD_ScrollRight(void)
+{
+	LCD_WriteInstruction(HD44780_DISPLAY_CURSOR_SHIFT | HD44780_SHIFT_DISPLAY | HD44780_SHIFT_RIGHT);
+}
+
+/**
+ *
+ */
+void LCD_ScrollLeft(void)
+{
+	LCD_WriteInstruction(HD44780_DISPLAY_CURSOR_SHIFT | HD44780_SHIFT_DISPLAY);
+}
+
+/**
+ *
+ */
+void LCD_CursorMoveRight(void)
+{
+	LCD_WriteInstruction(HD44780_DISPLAY_CURSOR_SHIFT | HD44780_SHIFT_RIGHT);
+}
+
+/**
+ *
+ */
+void LCD_CursorMoveLeft(void)
+{
+	LCD_WriteInstruction(HD44780_DISPLAY_CURSOR_SHIFT);
+}
+
+/**
+ *
+ * @param x
+ * @param y
+ */
+void LCD_SetLoc(uint8_t x, uint8_t y)
+{
+	LCD_WriteInstruction(HD44780_DDRAM_SET | ((y & 0x01) << 6) | (x & 0x3f));
+}
+
+/**
+ * @brief	print a string
+ * @param 	str : string to print
+ */
+void LCD_Print(char *str)
+{
+	while(*str) LCD_WriteData(*str++);
+}
+
+
+/**
  * @brief	Control backlight and display on/off
  * @param	newState
  */
@@ -202,8 +282,6 @@ void LCD_Sleep(FunctionalState newState)
 	LCD_Display(newState);
 	GPIO_WriteBit(LCD_PIN_BL, (BitAction)newState);
 }
-
-
 
 /**
  * @brief Configure flow of 4bits mode after power on
@@ -260,16 +338,8 @@ void LCD_Init(void)
 	LCD_WriteInstruction(HD44780_FUNCTION_SET | HD44780_TWO_LINE); // set LCD to font 5x7, 2 line
 	LCD_Display(DISABLE);
 	LCD_Clear();
-	LCD_WriteInstruction(0x06); // set to cursor move mode
-	//LCD_WriteInstruction(0x00);
+	LCD_LeftToRightMode(ENABLE);
 	LCD_Display(ENABLE);
-
-	//LCD_WriteInstruction(0x81); // goto 1, 0
-	LCD_WriteData('H');
-	LCD_WriteData('e');
-	LCD_WriteData('l');
-	LCD_WriteData('l');
-	LCD_WriteData('o');
 
 #if SUPPORT_LCD_TEST_COMMAND
 	LCD_Test();
