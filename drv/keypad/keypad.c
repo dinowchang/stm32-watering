@@ -14,10 +14,9 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "config.h"
+#include <stdio.h>
 #include "type.h"
 #include "stm32f4xx.h"
-#include "debug.h"
 
 /* Private typedef -----------------------------------------------------------*/
 #define KEY_PORT		GPIOA

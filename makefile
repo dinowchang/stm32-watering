@@ -17,10 +17,8 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							command.c						\
 
 # Drivers
-VPATH					+=  $(TOP)/src/drivers
-
-PROJECT_INC_PATHS		+=	-I$(TOP)/inc/drivers			\
-
+VPATH					+=  $(TOP)/drv/keypad
+PROJECT_INC_PATHS		+=	-I$(TOP)/drv/keypad
 PROJECT_SOURCE			+=	keypad.c						\
 
 
