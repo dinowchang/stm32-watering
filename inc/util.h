@@ -27,5 +27,6 @@
 /* Exported functions ------------------------------------------------------- */
 uint32_t HexToInt(char *str, uint16_t len);
 uint32_t DecToInt(char *str, uint16_t len);
+void udelay(uint32_t us);
 
 #endif /* __INC_UTIL_H_ */
