@@ -27,8 +27,14 @@ PROJECT_SOURCE			+=	lcd1602.c						\
 # Soil moisture sensor driver
 VPATH					+=  $(TOP)/drv/soil-moisture
 PROJECT_INC_PATHS		+=	-I$(TOP)/drv/soil-moisture
-PROJECT_SOURCE			+=	soil-moisture.c						\
+PROJECT_SOURCE			+=	soil-moisture.c					\
 							soil-moisture-test.c
+
+# Drivers
+VPATH					+=  $(TOP)/drv/keypad
+PROJECT_INC_PATHS		+=	-I$(TOP)/drv/keypad
+PROJECT_SOURCE			+=	keypad.c						\
+							keypad-test.c
 
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS

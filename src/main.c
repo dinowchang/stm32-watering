@@ -25,11 +25,15 @@
 #include "calendar.h"
 #include "lcd1602.h"
 #include "soil-moisture.h"
+#include "keypad.h"
 
 /* Private typedef -----------------------------------------------------------*/
+
 /* Private define ------------------------------------------------------------*/
 #define DBG_SYSINFO			TRUE
+
 /* Private macro -------------------------------------------------------------*/
+
 /* Private variables ---------------------------------------------------------*/
 static __IO uint32_t uwTimingDelay;
 
@@ -55,6 +59,7 @@ int main(void)
 	CALENDAR_Init();
 	LCD_Init();
 	SOIL_Init();
+	KEY_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();
