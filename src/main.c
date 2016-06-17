@@ -24,6 +24,7 @@
 #include "command.h"
 #include "calendar.h"
 #include "lcd1602.h"
+#include "soil-moisture.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -53,6 +54,7 @@ int main(void)
 	COMM_Init();
 	CALENDAR_Init();
 	LCD_Init();
+	SOIL_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();

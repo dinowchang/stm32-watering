@@ -23,6 +23,13 @@ VPATH					+=  $(TOP)/drv/lcd1602
 PROJECT_INC_PATHS		+=	-I$(TOP)/drv/lcd1602
 PROJECT_SOURCE			+=	lcd1602.c						\
 							lcd1602-test.c
+
+# Soil moisture sensor driver
+VPATH					+=  $(TOP)/drv/soil-moisture
+PROJECT_INC_PATHS		+=	-I$(TOP)/drv/soil-moisture
+PROJECT_SOURCE			+=	soil-moisture.c						\
+							soil-moisture-test.c
+
 # FreeRTOS
 VPATH					+=  $(TOP)/lib/FreeRTOS
 
@@ -50,6 +57,7 @@ VPATH					+=  $(TOP)/lib/STM32F4xx_StdPeriph_Driver/src
 PROJECT_INC_PATHS		+=	-I$(TOP)/lib/STM32F4xx_StdPeriph_Driver/inc
 
 PROJECT_SOURCE			+=	misc.c                       \
+							stm32f4xx_adc.c              \
 							stm32f4xx_exti.c             \
 							stm32f4xx_gpio.c             \
 							stm32f4xx_pwr.c              \
@@ -57,7 +65,6 @@ PROJECT_SOURCE			+=	misc.c                       \
 							stm32f4xx_rtc.c              \
 							stm32f4xx_usart.c            \
 #							stm32f4xx_tim.c              \
-#							stm32f4xx_adc.c              \
 #							stm32f4xx_can.c              \
 #							stm32f4xx_cec.c              \
 #							stm32f4xx_crc.c              \
