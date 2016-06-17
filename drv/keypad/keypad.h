@@ -35,7 +35,6 @@ typedef enum {
 void KEY_Init(void);
 void KEY_Enable(void);
 void KEY_Disable(void);
-uint16_t KEY_GetValue(void);
 Key_t KEY_GetKey(void);
 
 void KEY_Test(void);

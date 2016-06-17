@@ -38,7 +38,7 @@
  * @param	pcCommandString
  * @return
  */
-static BaseType_t KEY_ReadCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+static BaseType_t KEY_GetCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
 	Key_t key;
 	key = KEY_GetKey();
@@ -70,19 +70,18 @@ static BaseType_t KEY_ReadCommand(char *pcWriteBuffer, size_t xWriteBufferLen, c
 			break;
 
 	}
-	//sprintf(pcWriteBuffer, "Key ADC Value = %d , %04x\n", data, data);
 	return pdFALSE;
 }
 
-static const CLI_Command_Definition_t xKeyRead =
+static const CLI_Command_Definition_t xKeyGet =
 {
-	"key_read",
-	"key_read:\n    Return ADV value\n",
-	KEY_ReadCommand,
+	"key_get",
+	"key_get:\n    Return button pressed on keypad\n",
+	KEY_GetCommand,
 	0
 };
 
 void KEY_Test(void)
 {
-	FreeRTOS_CLIRegisterCommand(&xKeyRead);
+	FreeRTOS_CLIRegisterCommand(&xKeyGet);
 }

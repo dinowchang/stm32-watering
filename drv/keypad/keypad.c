@@ -53,21 +53,15 @@ KeyVoltage_t m_KeyVoltageTable[] =
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
-uint16_t KEY_GetValue(void)
+Key_t KEY_GetKey(void)
 {
+	uint8_t i = 0;
+	uint16_t voltage;
+
 	ADC_ClearFlag(KEY_ADC_PORT, ADC_FLAG_EOC); //Clear EOC flag
 	while(ADC_GetFlagStatus(KEY_ADC_PORT, ADC_FLAG_EOC) == RESET); //Wail for conversion complete
 
-	return ADC_GetConversionValue(KEY_ADC_PORT);
-}
-
-Key_t KEY_GetKey(void)
-{
-	uint16_t voltage;
-
-	voltage = KEY_GetValue();
-
-	uint8_t i = 0;
+	voltage = ADC_GetConversionValue(KEY_ADC_PORT);
 
 	while( m_KeyVoltageTable[i].threshold  < voltage) i++;
 
