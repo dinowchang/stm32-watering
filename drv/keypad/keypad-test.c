@@ -40,32 +40,32 @@
  */
 static BaseType_t KEY_ReadCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
-	KeyPadButton key;
+	Key_t key;
 	key = KEY_GetKey();
 
 	switch(key)
 	{
-		case eKeyNone:
+		case Key_None:
 			sprintf(pcWriteBuffer, "Key_None\n");
 			break;
 
-		case eKeyLeft:
+		case Key_Left:
 			sprintf(pcWriteBuffer, "Key_Left\n");
 			break;
 
-		case eKeyRight:
+		case Key_Right:
 			sprintf(pcWriteBuffer, "Key_Right\n");
 			break;
 
-		case eKeyUp:
+		case Key_Up:
 			sprintf(pcWriteBuffer, "Key_Up\n");
 			break;
 
-		case eKeyDown:
+		case Key_Down:
 			sprintf(pcWriteBuffer, "Key_Down\n");
 			break;
 
-		case eKeySelect:
+		case Key_Select:
 			sprintf(pcWriteBuffer, "Key_Select\n");
 			break;
 

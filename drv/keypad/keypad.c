@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
 {
-	KeyPadButton key;
+	Key_t key;
 	uint16_t threshold;
 } KeyVoltage_t;
 
@@ -42,12 +42,12 @@ typedef struct
 /* Private variables ---------------------------------------------------------*/
 KeyVoltage_t m_KeyVoltageTable[] =
 {
-	{eKeyRight,		18	},
-	{eKeyUp,		59	},
-	{eKeyDown,		104	},
-	{eKeyLeft,		155	},
-	{eKeySelect,	220	},
-	{eKeyNone,		256	},
+	{Key_Right,		18	},
+	{Key_Up,		59	},
+	{Key_Down,		104	},
+	{Key_Left,		155	},
+	{Key_Select,	220	},
+	{Key_None,		256	},
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,7 +61,7 @@ uint16_t KEY_GetValue(void)
 	return ADC_GetConversionValue(KEY_ADC_PORT);
 }
 
-KeyPadButton KEY_GetKey(void)
+Key_t KEY_GetKey(void)
 {
 	uint16_t voltage;
 
