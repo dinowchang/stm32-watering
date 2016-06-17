@@ -19,8 +19,8 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							calendar.c						\
 
 # Soil moisture sensor driver
-VPATH					+=  $(TOP)/src/drivers/soil-moisture
-PROJECT_INC_PATHS		+=	-I$(TOP)/src/drivers/soil-moisture
+VPATH					+=  $(TOP)/drv/soil-moisture
+PROJECT_INC_PATHS		+=	-I$(TOP)/drv/soil-moisture
 PROJECT_SOURCE			+=	soil-moisture.c						\
 							soil-moisture-test.c
 
