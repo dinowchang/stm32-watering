@@ -29,7 +29,7 @@
 #define LCD_INSTRUCTION_LONG_DELAY			(uint32_t)1600
 
 // LCD Pins
-#define LCD_PIN_CLOCK						RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC
+#define LCD_GPIO_CLOCK_PORT					RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC
 #define LCD_PIN_DB4_PORT					GPIOB
 #define LCD_PIN_DB4_NUM						GPIO_Pin_5
 #define LCD_PIN_DB5_PORT					GPIOB
@@ -303,7 +303,7 @@ static void LCD_SetTo4BitsMode(void)
  */
 void LCD_Init(void)
 {
-	RCC_AHB1PeriphClockCmd(LCD_PIN_CLOCK, ENABLE);
+	RCC_AHB1PeriphClockCmd(LCD_GPIO_CLOCK_PORT, ENABLE);
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
