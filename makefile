@@ -4,6 +4,7 @@ TOP = .
 # General project files
 VPATH					:=	$(TOP)/src						\
 							$(TOP)/src/system				\
+							$(TOP)/src/menu					\
                              
 PROJECT_INC_PATHS		:=	-I$(TOP)/inc					\
 
@@ -17,6 +18,9 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							command.c						\
 							util.c							\
 							calendar.c						\
+							menu.c							\
+							mainmenu.c						\
+							moisturemenu.c					\
 
 # LCD1602 driver
 VPATH					+=  $(TOP)/drv/lcd1602

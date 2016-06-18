@@ -26,6 +26,7 @@
 #include "lcd1602.h"
 #include "soil-moisture.h"
 #include "keypad.h"
+#include "menu.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -60,6 +61,7 @@ int main(void)
 	LCD_Init();
 	SOIL_Init();
 	KEY_Init();
+	MENU_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();

@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_SOIL_TEST_COMMAND			1
+#define SUPPORT_SOIL_TEST_COMMAND			0
 
 #define SOIL_GPIO_CLOCK_PORT				RCC_AHB1Periph_GPIOC
 #define SOIL_PIN_VCC_PORT					GPIOC
@@ -36,6 +36,7 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+static bool m_SensorEnabled = FALSE;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -62,6 +63,7 @@ void SOIL_Open(void)
 	// configure ADC channel
 	ADC_InitTypeDef ADC_InitStruct;
 	ADC_StructInit(&ADC_InitStruct);
+	ADC_InitStruct.ADC_Resolution = ADC_Resolution_8b;
 	ADC_InitStruct.ADC_ContinuousConvMode = ENABLE;
 	ADC_Init(SOIL_ADC_PORT, &ADC_InitStruct);
 	ADC_RegularChannelConfig(SOIL_ADC_PORT, ADC_Channel_15, 1, ADC_SampleTime_84Cycles);
@@ -69,6 +71,8 @@ void SOIL_Open(void)
 	ADC_Cmd(SOIL_ADC_PORT, ENABLE);
 
 	ADC_SoftwareStartConv(SOIL_ADC_PORT); //Start ADC1 software conversion
+
+	m_SensorEnabled = TRUE;
 }
 
 /**
@@ -77,6 +81,8 @@ void SOIL_Open(void)
  */
 uint16_t SOIL_Read(void)
 {
+	if (!m_SensorEnabled) return 0;
+
 	ADC_ClearFlag(SOIL_ADC_PORT, ADC_FLAG_EOC); //Clear EOC flag
 	while(ADC_GetFlagStatus(SOIL_ADC_PORT, ADC_FLAG_EOC) == RESET); //Wail for conversion complete
 
@@ -103,6 +109,8 @@ void SOIL_Close(void)
 	GPIO_Init(SOIL_PIN_VCC_PORT, &GPIO_InitStructure);
 
 	ADC_Cmd(SOIL_ADC_PORT, DISABLE);
+
+	m_SensorEnabled = FALSE;
 }
 
 /**

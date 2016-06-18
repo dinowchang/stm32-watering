@@ -27,7 +27,7 @@ typedef struct
 } KeyVoltage_t;
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_KEYPAD_TEST_COMMAND			1 // debug command for FreeRTOS-CLI
+#define SUPPORT_KEYPAD_TEST_COMMAND			0 // debug command for FreeRTOS-CLI
 
 #define KEY_GPIO_CLOCK_PORT					RCC_AHB1Periph_GPIOA
 #define KEY_PIN_PORT						GPIOA
