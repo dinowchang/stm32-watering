@@ -31,6 +31,8 @@
 /* Exported constants --------------------------------------------------------*/
 #define MENU_DEFAULT_MENU				(mainMenu)
 
+#define DEBUG_MENU						1
+
 /* Exported macro ------------------------------------------------------------*/
 
 /* Exported variables --------------------------------------------------------*/

@@ -27,7 +27,7 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-Menu_t *m_currentMenu;
+static Menu_t *m_currentMenu;
 
 /* Private function prototypes -----------------------------------------------*/
 

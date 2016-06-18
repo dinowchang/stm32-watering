@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_SOIL_TEST_COMMAND			1
+#define SUPPORT_SOIL_TEST_COMMAND			0
 
 #define SOIL_GPIO_CLOCK_PORT				RCC_AHB1Periph_GPIOC
 #define SOIL_PIN_VCC_PORT					GPIOC
