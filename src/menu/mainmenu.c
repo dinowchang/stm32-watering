@@ -34,7 +34,7 @@ static MainMenuItem_t m_menuList[] =
 {
 		{ "-- Main Menu --", NULL},
 		{ " Watering set  ", NULL},
-		{ " Moist. mon    ", NULL},
+		{ " Moist. mon    ", &moistureMenu},
 		{ " Clock         ", NULL},
 		{ " Test func.    ", NULL},
 		{ "---   End   ---", NULL}
@@ -53,6 +53,7 @@ static uint8_t m_curListPos = 0;
  */
 void mainMenu_Open(void)
 {
+	LCD_Display(DISABLE);
 	LCD_Clear();
 	LCD_SetLoc(1,0);
 	LCD_Print(m_menuList[0].name);
@@ -63,6 +64,7 @@ void mainMenu_Open(void)
 	m_curListPos = 0;
 	LCD_SetLoc(0,0);
 	LCD_Blink(ENABLE);
+	LCD_Display(ENABLE);
 }
 
 /**

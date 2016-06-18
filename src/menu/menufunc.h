@@ -38,6 +38,7 @@
 /* Exported variables --------------------------------------------------------*/
 // declare menu here
 extern Menu_t mainMenu;
+extern Menu_t moistureMenu;
 
 /* Exported functions ------------------------------------------------------- */
 void MENU_SwitchMenu(Menu_t *newMenu);
