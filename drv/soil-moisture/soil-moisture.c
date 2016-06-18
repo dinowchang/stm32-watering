@@ -63,7 +63,7 @@ void SOIL_Open(void)
 	// configure ADC channel
 	ADC_InitTypeDef ADC_InitStruct;
 	ADC_StructInit(&ADC_InitStruct);
-	ADC_InitStruct.ADC_Resolution = ADC_Resolution_6b;
+	ADC_InitStruct.ADC_Resolution = ADC_Resolution_8b;
 	ADC_InitStruct.ADC_ContinuousConvMode = ENABLE;
 	ADC_Init(SOIL_ADC_PORT, &ADC_InitStruct);
 	ADC_RegularChannelConfig(SOIL_ADC_PORT, ADC_Channel_15, 1, ADC_SampleTime_84Cycles);

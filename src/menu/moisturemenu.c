@@ -26,7 +26,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 uint8_t m_liveCnt = 0;
-char m_live[4] = { '-', '\\', '|', '/'};
+char m_live[4] = { '-', '_'};
 int32_t m_lastUpdateTime;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,7 +67,7 @@ void moistMenu_Update(void)
 		char buf[17];
 
 		m_liveCnt++;
-		if (m_liveCnt == 4)
+		if (m_liveCnt == 2)
 			m_liveCnt = 0;
 		m_lastUpdateTime = (int32_t) xTaskGetTickCount();
 		data = SOIL_Read();
