@@ -159,8 +159,15 @@ void setClockMenu_Open(void)
 
 void setClockMenu_Left(void)
 {
-	if ( m_curPos > CURSOR_POS_BACK ) m_curPos--;
-	setClockMenu_UpdataCurPos();
+	if ( m_curPos == CURSOR_POS_BACK )
+	{
+		MENU_SwitchMenu(&clockMenu);
+	}
+	else
+	{
+		m_curPos--;
+		setClockMenu_UpdataCurPos();
+	}
 }
 
 void setClockMenu_Right(void)
