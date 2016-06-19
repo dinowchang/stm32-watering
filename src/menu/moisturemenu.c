@@ -27,7 +27,7 @@
 /* Private variables ---------------------------------------------------------*/
 uint8_t m_liveCnt = 0;
 char m_live[4] = { '-', '_'};
-int32_t m_lastUpdateTime;
+static int32_t m_lastUpdateTime;
 
 /* Private function prototypes -----------------------------------------------*/
 

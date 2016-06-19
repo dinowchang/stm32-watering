@@ -21,7 +21,8 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							menu.c							\
 							mainmenu.c						\
 							moisturemenu.c					\
-
+							clockmenu.c					\
+							
 # LCD1602 driver
 VPATH					+=  $(TOP)/drv/lcd1602
 PROJECT_INC_PATHS		+=	-I$(TOP)/drv/lcd1602
