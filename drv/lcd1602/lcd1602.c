@@ -279,8 +279,8 @@ void LCD_Print(char *str)
  */
 void LCD_Sleep(FunctionalState newState)
 {
-	LCD_Display(newState);
-	GPIO_WriteBit(LCD_PIN_BL, (BitAction)newState);
+	LCD_Display(!newState);
+	GPIO_WriteBit(LCD_PIN_BL, (BitAction)(!newState));
 }
 
 /**
