@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_LCD_TEST_COMMAND			1 // debug command for FreeRTOS-CLI
+#define SUPPORT_LCD_TEST_COMMAND			0 // debug command for FreeRTOS-CLI
 
 #define LCD_NIBBLE_DELAY					5
 #define LCD_INSTRUCTION_DELAY				40

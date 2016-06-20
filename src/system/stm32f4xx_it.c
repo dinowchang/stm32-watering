@@ -185,6 +185,18 @@ void USART3_IRQHandler(void)
 }
 #endif
 
+/**
+ * @brief  EXTI0 interrupt handler
+ */
+void EXTI0_IRQHandler(void)
+{
+	if ( EXTI_GetITStatus(EXTI_Line0) )
+	{
+		/* Clear EXTI line0 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line0);
+	}
+}
+
 
 /**
   * @}
