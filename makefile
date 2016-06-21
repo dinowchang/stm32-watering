@@ -23,6 +23,7 @@ PROJECT_SOURCE			:=	startup_stm32f446xx.s			\
 							moisturemenu.c					\
 							clockmenu.c						\
 							water.c							\
+							watermenu.c						\
 							
 # LCD1602 driver
 VPATH					+=  $(TOP)/drv/lcd1602

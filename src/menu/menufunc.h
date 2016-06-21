@@ -42,6 +42,7 @@ extern Menu_t mainMenu;
 extern Menu_t moistureMenu;
 extern Menu_t clockMenu;
 extern Menu_t setClockMenu;
+extern Menu_t waterMenu;
 
 /* Exported functions ------------------------------------------------------- */
 void MENU_SwitchMenu(Menu_t *newMenu);
