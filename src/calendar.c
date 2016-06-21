@@ -27,46 +27,6 @@
 /* Private define ------------------------------------------------------------*/
 
 /* Private macro -------------------------------------------------------------*/
-/************************* PLL Parameters *************************************/
-#if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F401xx) || defined(STM32F469_479xx)
- /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N */
- #define PLL_M      25
-#elif defined (STM32F446xx)
- #define PLL_M      8
-#elif defined (STM32F410xx) || defined (STM32F411xE)
- #if defined(USE_HSE_BYPASS)
-  #define PLL_M      8
- #else /* !USE_HSE_BYPASS */
-  #define PLL_M      16
- #endif /* USE_HSE_BYPASS */
-#else
-#endif /* STM32F40_41xxx || STM32F427_437xx || STM32F429_439xx || STM32F401xx || STM32F469_479xx */
-
-/* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
-#define PLL_Q      7
-
-#if defined(STM32F446xx)
-/* PLL division factor for I2S, SAI, SYSTEM and SPDIF: Clock =  PLL_VCO / PLLR */
-#define PLL_R      7
-#endif /* STM32F446xx */
-
-#if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F446xx) || defined(STM32F469_479xx)
-#define PLL_N      360
-/* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      2
-#endif /* STM32F40_41xxx || STM32F427_437x || STM32F429_439xx || STM32F446xx || STM32F469_479xx */
-
-#if defined(STM32F401xx)
-#define PLL_N      336
-/* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      4
-#endif /* STM32F401xx */
-
-#if defined(STM32F410xx) || defined(STM32F411xE)
-#define PLL_N      400
-/* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      4
-#endif /* STM32F410xx || STM32F411xE */
 
 /* Private variables ---------------------------------------------------------*/
 
@@ -263,8 +223,8 @@ static BaseType_t CALENDAR_SleepCommand(char *pcWriteBuffer, size_t xWriteBuffer
 	PWR_EnterSTOPMode(PWR_MainRegulator_ON, PWR_STOPEntry_WFI);
 
 	// clock is changed when exit stop mode, reset again
-	extern void SetSysClock(void);
-	SetSysClock();
+	extern void ResetSysClock(void);
+	ResetSysClock();
 
 	// Enable systick interrupt
 	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;

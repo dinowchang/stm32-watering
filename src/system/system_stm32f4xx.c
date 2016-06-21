@@ -450,7 +450,7 @@ __I uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9}
   * @{
   */
 
-void SetSysClock(void);
+static void SetSysClock(void);
 
 #if defined(DATA_IN_ExtSRAM) || defined(DATA_IN_ExtSDRAM)
 static void SystemInit_ExtMemCtl(void); 
@@ -642,7 +642,7 @@ void SystemCoreClockUpdate(void)
   * @param  None
   * @retval None
   */
-void SetSysClock(void)
+static void SetSysClock(void)
 {
 #if defined(STM32F40_41xxx) || defined(STM32F427_437xx) || defined(STM32F429_439xx) || defined(STM32F401xx) || defined(STM32F446xx)|| defined(STM32F469_479xx)
 /******************************************************************************/

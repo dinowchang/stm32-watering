@@ -21,9 +21,6 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define DBG_MENU							1
-
-
 #define MENU_TASK_PRIORITY					( tskIDLE_PRIORITY + 1UL )
 #define MENU_KEY_POLLING_DELAY				10
 #define MENU_KEY_DETECTION_TIMEOUT			100
@@ -110,7 +107,7 @@ Key_t MENU_GetNewKey(int16_t timeout)
 	return Key_None;
 }
 
-static void MENU_Sleep(void)
+void MENU_Sleep(void)
 {
 	LCD_Sleep(ENABLE);
 	KEY_SetIntrMode(ENABLE);
@@ -125,8 +122,8 @@ static void MENU_Sleep(void)
 	PWR_EnterSTOPMode(PWR_MainRegulator_ON, PWR_STOPEntry_WFI);
 
 	// clock is changed when exit stop mode, reset again
-	extern void SetSysClock(void);
-	SetSysClock();
+	extern void ResetSysClock(void);
+	ResetSysClock();
 
 	// Enable systick interrupt
 	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
@@ -179,6 +176,9 @@ static void MENU_Task( void *pvParameters )
 			{
 				if ((((int32_t) xTaskGetTickCount()) - idleStartTime) > MENU_KEY_SLEEP_TIMEOUT)
 				{
+					if( m_currentMenu->close != NULL)
+						m_currentMenu->close();
+
 					break;
 				}
 			}
