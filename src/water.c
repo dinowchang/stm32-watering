@@ -32,6 +32,7 @@
 #define WATER_DEFAULT_MINUTE					0
 #define WATER_DEFAULT_SECOND					0
 #define WATER_DEFAULT_PERIOD					5000
+#define WATER_DEFAULT_MOISTURE_THRESHOLD		0
 
 #define WATER_GPIO_CLOCK_PORT					RCC_AHB1Periph_GPIOC
 #define WATER_PIN_PORT							GPIOC
@@ -41,6 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 static uint32_t m_period;
+static uint16_t m_moistureThreshold;
 static RTC_AlarmTypeDef m_waterTime;
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,6 +73,22 @@ void WATER_SetPeriod(uint32_t newPeriod)
 uint32_t WATER_GetPeriod(void)
 {
 	return m_period;
+}
+
+/**
+ * @brief	Set the moisture thresold to water
+ */
+void WATER_SetThreshold(uint16_t newThreshold)
+{
+	m_moistureThreshold = newThreshold;
+}
+
+/**
+ * @brief	Get the moisture threshold to water
+ */
+uint16_t WATER_GetThreshold(void)
+{
+	return m_moistureThreshold;
 }
 
 /**
@@ -155,6 +173,7 @@ void WATER_Init(void)
 	RTC_AlarmCmd(RTC_Alarm_A, ENABLE);
 
 	m_period = WATER_DEFAULT_PERIOD;
+	m_moistureThreshold = WATER_DEFAULT_MOISTURE_THRESHOLD;
 
 #if SUPPORT_WATER_TEST_COMMAND
 	FreeRTOS_CLIRegisterCommand(&xWaterOpen);

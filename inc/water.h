@@ -31,5 +31,7 @@ void WATER_SetPeriod(uint32_t newPeriod);
 uint32_t WATER_GetPeriod(void);
 void WATER_SetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct);
 void WATER_GetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct);
+void WATER_SetThreshold(uint16_t newThreshold);
+uint16_t WATER_GetThreshold(void);
 
 #endif /* __INC_WATER_H_ */
