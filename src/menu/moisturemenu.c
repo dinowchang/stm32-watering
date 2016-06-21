@@ -40,6 +40,7 @@ void moistMenu_Open(void)
 	char buf[17];
 
 	SOIL_Open();
+	vTaskDelay(100); // wait sensor stable
 
 	m_liveCnt = 0;
 	m_lastUpdateTime = (int32_t) xTaskGetTickCount();

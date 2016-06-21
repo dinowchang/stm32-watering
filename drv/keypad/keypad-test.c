@@ -81,7 +81,29 @@ static const CLI_Command_Definition_t xKeyGet =
 	0
 };
 
+/**
+ * @param	pcWriteBuffer
+ * @param	xWriteBufferLen
+ * @param	pcCommandString
+ * @return
+ */
+static BaseType_t KEY_IntrCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	KEY_SetIntrMode(ENABLE);
+	sprintf(pcWriteBuffer, "Keypad was set to interrupt mode\n");
+	return pdFALSE;
+}
+
+static const CLI_Command_Definition_t xKeySleep =
+{
+	"key_intr",
+	"key_intr:\n    Set keypad to interrupt mode\n",
+	KEY_IntrCommand,
+	0
+};
+
 void KEY_Test(void)
 {
 	FreeRTOS_CLIRegisterCommand(&xKeyGet);
+	FreeRTOS_CLIRegisterCommand(&xKeySleep);
 }

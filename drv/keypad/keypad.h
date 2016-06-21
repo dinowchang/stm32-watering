@@ -36,6 +36,7 @@ void KEY_Init(void);
 void KEY_Enable(void);
 void KEY_Disable(void);
 Key_t KEY_GetKey(void);
+void KEY_SetIntrMode(FunctionalState newState);
 
 void KEY_Test(void);
 

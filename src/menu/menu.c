@@ -17,12 +17,14 @@
 #include "menufunc.h"
 #include "keypad.h"
 
+
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
 #define MENU_TASK_PRIORITY					( tskIDLE_PRIORITY + 1UL )
-#define MENU_KEY_DETECTION_TIMEOUT			100
 #define MENU_KEY_POLLING_DELAY				10
+#define MENU_KEY_DETECTION_TIMEOUT			100
+#define MENU_KEY_SLEEP_TIMEOUT				30000
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -105,21 +107,57 @@ Key_t MENU_GetNewKey(int16_t timeout)
 	return Key_None;
 }
 
+void MENU_Sleep(void)
+{
+	LCD_Sleep(ENABLE);
+	KEY_SetIntrMode(ENABLE);
+
+	RTC_TimeTypeDef RTC_SleepTime, RTC_WakeupTime;
+	RTC_GetTime(RTC_Format_BIN, &RTC_SleepTime);
+
+	// Disable systick interrupt to prevent that wake up immediately
+	SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
+
+	// Enter stop mode
+	PWR_EnterSTOPMode(PWR_MainRegulator_ON, PWR_STOPEntry_WFI);
+
+	// clock is changed when exit stop mode, reset again
+	extern void ResetSysClock(void);
+	ResetSysClock();
+
+	// Enable systick interrupt
+	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
+
+	RTC_GetTime(RTC_Format_BIN, &RTC_WakeupTime);
+
+	DEBUG_printf(DBG_MENU, "Sleep @ %02d:%02d:%02d, Wake up @ %02d:%02d:%02d\n",
+			RTC_SleepTime.RTC_Hours, RTC_SleepTime.RTC_Minutes,
+			RTC_SleepTime.RTC_Seconds, RTC_WakeupTime.RTC_Hours,
+			RTC_WakeupTime.RTC_Minutes, RTC_WakeupTime.RTC_Seconds);
+
+	KEY_SetIntrMode(DISABLE);
+	LCD_Sleep(DISABLE);
+}
+
 /**
  *
  * @param pvParameters
  */
 static void MENU_Task( void *pvParameters )
 {
-	TickType_t xLastFlashTime;
-	xLastFlashTime = xTaskGetTickCount();
-
 	Key_t key;
+	int32_t idleStartTime = (int32_t) xTaskGetTickCount();
 
 	while(1)
 	{
+
+		// Check watering event
+
+		// Check keypad event
+
 		// Reset Menu
 		KEY_Enable();
+		idleStartTime = (int32_t) xTaskGetTickCount();
 
 		m_currentMenu = &MENU_DEFAULT_MENU;
 		if( m_currentMenu->open != NULL )
@@ -129,6 +167,22 @@ static void MENU_Task( void *pvParameters )
 		while(1)
 		{
 			key = MENU_GetNewKey(MENU_KEY_DETECTION_TIMEOUT);
+
+			if( key != Key_None )
+			{
+				idleStartTime = (int32_t) xTaskGetTickCount();
+			}
+			else
+			{
+				if ((((int32_t) xTaskGetTickCount()) - idleStartTime) > MENU_KEY_SLEEP_TIMEOUT)
+				{
+					if( m_currentMenu->close != NULL)
+						m_currentMenu->close();
+
+					break;
+				}
+			}
+
 
 			switch(key)
 			{
@@ -168,8 +222,7 @@ static void MENU_Task( void *pvParameters )
 		}
 
 		// Enter Sleep mode
-		vTaskDelayUntil( &xLastFlashTime, 4500 );
-
+		MENU_Sleep();
 	}
 }
 

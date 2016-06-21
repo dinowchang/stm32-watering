@@ -22,7 +22,7 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-#define SUPPORT_LCD_TEST_COMMAND			1 // debug command for FreeRTOS-CLI
+#define SUPPORT_LCD_TEST_COMMAND			0 // debug command for FreeRTOS-CLI
 
 #define LCD_NIBBLE_DELAY					5
 #define LCD_INSTRUCTION_DELAY				40
@@ -279,8 +279,8 @@ void LCD_Print(char *str)
  */
 void LCD_Sleep(FunctionalState newState)
 {
-	LCD_Display(newState);
-	GPIO_WriteBit(LCD_PIN_BL, (BitAction)newState);
+	LCD_Display(!newState);
+	GPIO_WriteBit(LCD_PIN_BL, (BitAction)(!newState));
 }
 
 /**
