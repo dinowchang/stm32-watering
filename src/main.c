@@ -27,6 +27,7 @@
 #include "soil-moisture.h"
 #include "keypad.h"
 #include "menu.h"
+#include "water.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -159,6 +160,7 @@ int main(void)
 	SOIL_Init();
 	KEY_Init();
 	MENU_Init();
+	WATER_Init();
 
 	// Start the scheduler
 	vTaskStartScheduler();
