@@ -24,7 +24,7 @@
 #define MENU_TASK_PRIORITY					( tskIDLE_PRIORITY + 1UL )
 #define MENU_KEY_POLLING_DELAY				10
 #define MENU_KEY_DETECTION_TIMEOUT			100
-#define MENU_KEY_SLEEP_TIMEOUT				10000
+#define MENU_KEY_SLEEP_TIMEOUT				30000
 
 /* Private macro -------------------------------------------------------------*/
 
