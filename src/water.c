@@ -45,7 +45,8 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
-static TaskHandle_t g_waterTask;
+static TaskHandle_t m_waterTask;
+static SemaphoreHandle_t m_waterLock;
 
 static uint32_t m_period;
 static uint16_t m_moistureThreshold;
@@ -131,7 +132,7 @@ void WATER_GetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct)
  */
 static BaseType_t WATER_OpenCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
-	xTaskNotifyGive(g_waterTask);
+	xTaskNotifyGive(m_waterTask);
 
 	pcWriteBuffer[0] = '\0'; // clean Write Buffer
 
@@ -147,10 +148,27 @@ static const CLI_Command_Definition_t xWaterOpen =
 };
 #endif
 
+/**
+ * @brief	Request a watering process
+ */
 void WATER_SendRequest(void)
 {
-	xTaskNotifyGive(g_waterTask);
+	xTaskNotifyGive(m_waterTask);
 }
+
+bool WATER_Lock(void)
+{
+	if( xSemaphoreTake(m_waterLock, 0) )
+		return TRUE;
+	else
+		return FALSE;
+}
+
+void WATER_Unlock(void)
+{
+	xSemaphoreGive(m_waterLock);
+}
+
 
 /**
  * @brief Water task for valve controlling
@@ -163,17 +181,21 @@ static void WATER_Task( void *pvParameters )
 	{
 		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 
+		xSemaphoreTake(m_waterLock, portMAX_DELAY);
+
 		SOIL_Open();
-		vTaskDelay(100); // wait sensor stable
+		vTaskDelay(100 / portTICK_PERIOD_MS); // wait sensor stable
 		moisture = SOIL_Read();
 		SOIL_Close();
 
 		if( moisture < m_moistureThreshold)
 		{
 			GPIO_ResetBits(WATER_PIN_PORT, WATER_PIN_NUM);
-			vTaskDelay(m_period);
+			vTaskDelay(m_period / portTICK_PERIOD_MS);
 			GPIO_SetBits(WATER_PIN_PORT, WATER_PIN_NUM);
 		}
+
+		xSemaphoreGive(m_waterLock);
 	}
 }
 
@@ -208,6 +230,7 @@ void WATER_Init(void)
 
 	m_period = WATER_DEFAULT_PERIOD;
 	m_moistureThreshold = WATER_DEFAULT_MOISTURE_THRESHOLD;
+	m_waterLock = xSemaphoreCreateMutex();
 
 	// Create that task that handles the console itself.
 	xTaskCreate( 	WATER_Task,					/* The task that implements the command console. */
@@ -215,7 +238,7 @@ void WATER_Init(void)
 					WATER_TASK_STACK,			/* The size of the stack allocated to the task. */
 					NULL,						/* The parameter is not used, so NULL is passed. */
 					WATER_TASK_PRIORITY,		/* The priority allocated to the task. */
-					&g_waterTask );				/* A handle is not required, so just pass NULL. */
+					&m_waterTask );				/* A handle is not required, so just pass NULL. */
 
 
 #if SUPPORT_WATER_TEST_COMMAND

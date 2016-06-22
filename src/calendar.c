@@ -366,22 +366,3 @@ void CALENDAR_Init(void)
 	FreeRTOS_CLIRegisterCommand( &xCalendarSleep );
 	FreeRTOS_CLIRegisterCommand( &xRtcCalibration );
 }
-
-/**
- * @brief IRQ handler of RTC alarm
- */
-void RTC_Alarm_IRQHandler(void)
-{
-	if ( EXTI_GetITStatus(EXTI_Line17) )
-	{
-		/* Clear EXTI line17 pending bit */
-		EXTI_ClearITPendingBit(EXTI_Line17);
-
-		if (RTC_GetITStatus(RTC_IT_ALRA) != RESET)
-		{
-			/* Clear the Alarm A Pending Bit */
-			RTC_ClearITPendingBit(RTC_IT_ALRA);
-		}
-	}
-
-}
