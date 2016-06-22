@@ -29,7 +29,7 @@
 #define CURSOR_FIELD_BACK				5
 
 #define WATER_MENU_LENGTH				(sizeof(waterMenu_Print) / sizeof(waterMenu_Print[0]))
-#define WATER_MENU_TIME_STEP			20
+#define WATER_MENU_TIME_STEP			30
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -183,6 +183,7 @@ static void waterMenu_Select(void)
 			break;
 
 		case  CURSOR_FIELD_TEST:
+			WATER_SendRequest();
 			break;
 
 		case  CURSOR_FIELD_BACK:
@@ -280,6 +281,7 @@ static void waterMenu_Right(void)
 		case  CURSOR_FIELD_TEST:
 		case  CURSOR_FIELD_BACK:
 			waterMenu_Select();
+			return;
 			break;
 
 		default:

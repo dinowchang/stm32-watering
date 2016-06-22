@@ -24,9 +24,11 @@
 
 /* Exported macro ------------------------------------------------------------*/
 
+/* Exported variables ---------------------------------------------------------*/
+
 /* Exported functions ------------------------------------------------------- */
 void WATER_Init(void);
-void WATER_Process(void);
+void WATER_SendRequest(void);
 void WATER_SetPeriod(uint32_t newPeriod);
 uint32_t WATER_GetPeriod(void);
 void WATER_SetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct);

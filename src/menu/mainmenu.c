@@ -36,7 +36,6 @@ static MainMenuItem_t m_menuList[] =
 		{ " Watering set  ", &waterMenu},
 		{ " Moist. mon    ", &moistureMenu},
 		{ " Clock         ", &clockMenu},
-		{ " Test func.    ", NULL},
 		{ "---   End   ---", NULL}
 };
 

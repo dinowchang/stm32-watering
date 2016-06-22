@@ -22,8 +22,12 @@
 #include "FreeRTOS_CLI.h"
 #include "debug.h"
 #include "util.h"
+#include "soil-moisture.h"
 
 /* Private typedef -----------------------------------------------------------*/
+#define WATER_TASK_PRIORITY					( tskIDLE_PRIORITY + 3UL )
+#define WATER_TASK_STACK					( 256/4 ) 							// 2048 bytes
+
 
 /* Private define ------------------------------------------------------------*/
 #define SUPPORT_WATER_TEST_COMMAND				0 // debug command for FreeRTOS-CLI
@@ -41,30 +45,25 @@
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+static TaskHandle_t g_waterTask;
+
 static uint32_t m_period;
 static uint16_t m_moistureThreshold;
 static RTC_AlarmTypeDef m_waterTime;
+
 
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
 
 /**
- * @brief	Open value for set period
- */
-void WATER_Process(void)
-{
-	GPIO_ResetBits(WATER_PIN_PORT, WATER_PIN_NUM);
-	vTaskDelay(m_period);
-	GPIO_SetBits(WATER_PIN_PORT, WATER_PIN_NUM);
-}
-
-/**
  * @brief	Set the period for valve open
  */
 void WATER_SetPeriod(uint32_t newPeriod)
 {
+	vTaskSuspendAll();
 	m_period = newPeriod;
+	xTaskResumeAll();
 }
 
 /**
@@ -80,7 +79,9 @@ uint32_t WATER_GetPeriod(void)
  */
 void WATER_SetThreshold(uint16_t newThreshold)
 {
+	vTaskSuspendAll();
 	m_moistureThreshold = newThreshold;
+	xTaskResumeAll();
 }
 
 /**
@@ -96,6 +97,7 @@ uint16_t WATER_GetThreshold(void)
  */
 void WATER_SetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct)
 {
+	vTaskSuspendAll();
 	RTC_AlarmCmd(RTC_Alarm_A, DISABLE);
 
 	m_waterTime.RTC_AlarmTime.RTC_H12 = RTC_TimeStruct->RTC_H12;
@@ -106,6 +108,7 @@ void WATER_SetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct)
 	RTC_SetAlarm(RTC_Format_BIN, RTC_Alarm_A, &m_waterTime);
 
 	RTC_AlarmCmd(RTC_Alarm_A, ENABLE);
+	xTaskResumeAll();
 }
 
 /**
@@ -128,7 +131,8 @@ void WATER_GetWaterTime(RTC_TimeTypeDef *RTC_TimeStruct)
  */
 static BaseType_t WATER_OpenCommand(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
 {
-	WATER_Process();
+	xTaskNotifyGive(g_waterTask);
+
 	pcWriteBuffer[0] = '\0'; // clean Write Buffer
 
 	return pdFALSE;
@@ -142,6 +146,36 @@ static const CLI_Command_Definition_t xWaterOpen =
 	0
 };
 #endif
+
+void WATER_SendRequest(void)
+{
+	xTaskNotifyGive(g_waterTask);
+}
+
+/**
+ * @brief Water task for valve controlling
+ * @param pvParameters
+ */
+static void WATER_Task( void *pvParameters )
+{
+	uint16_t moisture;
+	while(1)
+	{
+		ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+
+		SOIL_Open();
+		vTaskDelay(100); // wait sensor stable
+		moisture = SOIL_Read();
+		SOIL_Close();
+
+		if( moisture < m_moistureThreshold)
+		{
+			GPIO_ResetBits(WATER_PIN_PORT, WATER_PIN_NUM);
+			vTaskDelay(m_period);
+			GPIO_SetBits(WATER_PIN_PORT, WATER_PIN_NUM);
+		}
+	}
+}
 
 /**
  * @brief Configure gpio
@@ -174,6 +208,15 @@ void WATER_Init(void)
 
 	m_period = WATER_DEFAULT_PERIOD;
 	m_moistureThreshold = WATER_DEFAULT_MOISTURE_THRESHOLD;
+
+	// Create that task that handles the console itself.
+	xTaskCreate( 	WATER_Task,					/* The task that implements the command console. */
+					"WATER",					/* Text name assigned to the task.  This is just to assist debugging.  The kernel does not use this name itself. */
+					WATER_TASK_STACK,			/* The size of the stack allocated to the task. */
+					NULL,						/* The parameter is not used, so NULL is passed. */
+					WATER_TASK_PRIORITY,		/* The priority allocated to the task. */
+					&g_waterTask );				/* A handle is not required, so just pass NULL. */
+
 
 #if SUPPORT_WATER_TEST_COMMAND
 	FreeRTOS_CLIRegisterCommand(&xWaterOpen);
