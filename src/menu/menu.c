@@ -24,9 +24,9 @@
 #define MENU_TASK_PRIORITY					( tskIDLE_PRIORITY + 1UL )
 #define MENU_TASK_STACK						( 2048/4 ) 							// 2048 bytes
 
-#define MENU_KEY_POLLING_DELAY				10
-#define MENU_KEY_DETECTION_TIMEOUT			100
-#define MENU_KEY_SLEEP_TIMEOUT				30000
+#define MENU_KEY_POLLING_DELAY				(10 / portTICK_PERIOD_MS)
+#define MENU_KEY_DETECTION_TIMEOUT			(100 / portTICK_PERIOD_MS)
+#define MENU_KEY_SLEEP_TIMEOUT				(30000 / portTICK_PERIOD_MS)
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -242,7 +242,15 @@ static void MENU_Task( void *pvParameters )
 		}
 
 		// Enter Sleep mode
-		MENU_Sleep();
+		if( WATER_Lock() )
+		{
+			MENU_Sleep();
+			WATER_Unlock();
+		}
+		else
+		{
+			vTaskDelay(100 / portTICK_PERIOD_MS);
+		}
 
 	}
 }
