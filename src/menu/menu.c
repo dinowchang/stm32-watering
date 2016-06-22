@@ -26,7 +26,7 @@
 
 #define MENU_KEY_POLLING_DELAY				(10 / portTICK_PERIOD_MS)
 #define MENU_KEY_DETECTION_TIMEOUT			(100 / portTICK_PERIOD_MS)
-#define MENU_KEY_SLEEP_TIMEOUT				(30000 / portTICK_PERIOD_MS)
+#define MENU_KEY_SLEEP_TIMEOUT				(20000 / portTICK_PERIOD_MS)
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -125,8 +125,8 @@ Key_t MENU_GetNewKey(int16_t timeout)
 
 void MENU_Sleep(void)
 {
-	LCD_Sleep(ENABLE);
-	KEY_SetIntrMode(ENABLE);
+	//LCD_Sleep(ENABLE);
+	//KEY_SetIntrMode(ENABLE);
 
 	RTC_TimeTypeDef RTC_SleepTime, RTC_WakeupTime;
 	RTC_GetTime(RTC_Format_BIN, &RTC_SleepTime);
@@ -151,8 +151,83 @@ void MENU_Sleep(void)
 			RTC_SleepTime.RTC_Seconds, RTC_WakeupTime.RTC_Hours,
 			RTC_WakeupTime.RTC_Minutes, RTC_WakeupTime.RTC_Seconds);
 
-	KEY_SetIntrMode(DISABLE);
-	LCD_Sleep(DISABLE);
+	//KEY_SetIntrMode(DISABLE);
+	//LCD_Sleep(DISABLE);
+}
+
+/**
+ *
+ */
+void MENU_InputProcess(void)
+{
+	Key_t key;
+	int32_t idleStartTime;
+
+	// Reset Menu
+	KEY_Enable();
+	idleStartTime = (int32_t) xTaskGetTickCount();
+
+	m_currentMenu = &MENU_DEFAULT_MENU;
+	if( m_currentMenu->open != NULL )
+		m_currentMenu->open();
+
+	// Start menu loop
+	while(1)
+	{
+		key = MENU_GetNewKey(MENU_KEY_DETECTION_TIMEOUT);
+
+		if( key != Key_None )
+		{
+			idleStartTime = (int32_t) xTaskGetTickCount();
+		}
+		else
+		{
+			if ((((int32_t) xTaskGetTickCount()) - idleStartTime) > MENU_KEY_SLEEP_TIMEOUT)
+			{
+				if( m_currentMenu->close != NULL)
+					m_currentMenu->close();
+
+				break;
+			}
+		}
+
+		switch(key)
+		{
+			case Key_None:
+				if( m_currentMenu->redraw != NULL )
+					m_currentMenu->redraw();
+				break;
+
+			case Key_Left:
+				if( m_currentMenu->left != NULL )
+					m_currentMenu->left();
+				break;
+
+			case Key_Right:
+				if( m_currentMenu->right != NULL )
+					m_currentMenu->right();
+				break;
+
+			case Key_Up:
+				if( m_currentMenu->up != NULL )
+					m_currentMenu->up();
+				break;
+
+			case Key_Down:
+				if( m_currentMenu->down != NULL )
+					m_currentMenu->down();
+				break;
+
+			case Key_Select:
+				if( m_currentMenu->select != NULL )
+					m_currentMenu->select();
+				break;
+
+			default:
+				break;
+		}
+	}
+
 }
 
 /**
@@ -161,12 +236,10 @@ void MENU_Sleep(void)
  */
 static void MENU_Task( void *pvParameters )
 {
-	Key_t key;
-	int32_t idleStartTime = (int32_t) xTaskGetTickCount();
+	MENU_SetWakeupEvent(MENU_WAKEUP_KEYPAD); // Enabel display after power
 
 	while(1)
 	{
-
 		// Check watering event
 		if( m_wakeupEvent & MENU_WAKEUP_ALARM)
 		{
@@ -175,70 +248,16 @@ static void MENU_Task( void *pvParameters )
 		}
 
 		// Check keypad event
-
-		// Reset Menu
-		KEY_Enable();
-		idleStartTime = (int32_t) xTaskGetTickCount();
-
-		m_currentMenu = &MENU_DEFAULT_MENU;
-		if( m_currentMenu->open != NULL )
-			m_currentMenu->open();
-
-		// Start menu loop
-		while(1)
+		if( m_wakeupEvent & MENU_WAKEUP_KEYPAD)
 		{
-			key = MENU_GetNewKey(MENU_KEY_DETECTION_TIMEOUT);
+			KEY_SetIntrMode(DISABLE);
+			LCD_Sleep(DISABLE);
 
-			if( key != Key_None )
-			{
-				idleStartTime = (int32_t) xTaskGetTickCount();
-			}
-			else
-			{
-				if ((((int32_t) xTaskGetTickCount()) - idleStartTime) > MENU_KEY_SLEEP_TIMEOUT)
-				{
-					if( m_currentMenu->close != NULL)
-						m_currentMenu->close();
+			MENU_ClrWakeupEvent(MENU_WAKEUP_KEYPAD);
+			MENU_InputProcess();
 
-					break;
-				}
-			}
-
-			switch(key)
-			{
-				case Key_None:
-					if( m_currentMenu->redraw != NULL )
-						m_currentMenu->redraw();
-					break;
-
-				case Key_Left:
-					if( m_currentMenu->left != NULL )
-						m_currentMenu->left();
-					break;
-
-				case Key_Right:
-					if( m_currentMenu->right != NULL )
-						m_currentMenu->right();
-					break;
-
-				case Key_Up:
-					if( m_currentMenu->up != NULL )
-						m_currentMenu->up();
-					break;
-
-				case Key_Down:
-					if( m_currentMenu->down != NULL )
-						m_currentMenu->down();
-					break;
-
-				case Key_Select:
-					if( m_currentMenu->select != NULL )
-						m_currentMenu->select();
-					break;
-
-				default:
-					break;
-			}
+			LCD_Sleep(ENABLE);
+			KEY_SetIntrMode(ENABLE);
 		}
 
 		// Enter Sleep mode
