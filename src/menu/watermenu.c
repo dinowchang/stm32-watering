@@ -24,11 +24,12 @@
 #define CURSOR_FIELD_TIME				0
 #define CURSOR_FIELD_PERIOD				1
 #define CURSOR_FIELD_MOISTURE			2
-#define CURSOR_FIELD_TEST				3
-#define CURSOR_FIELD_SAVE				4
+#define CURSOR_FIELD_SAVE				3
+#define CURSOR_FIELD_TEST				4
 #define CURSOR_FIELD_CANCEL				5
 
 #define WATER_MENU_LENGTH				(sizeof(waterMenu_Print) / sizeof(waterMenu_Print[0]))
+#define WATER_MENU_TIME_STEP			20
 
 /* Private macro -------------------------------------------------------------*/
 
@@ -66,17 +67,17 @@ static void waterMenu_PrintMoisture(void)
 
 static void waterMenu_PrintTest(void)
 {
-	LCD_Print("Test           ");
+	LCD_Print("- Test -       ");
 }
 
 static void waterMenu_PrintSave(void)
 {
-	LCD_Print("Save           ");
+	LCD_Print("- Save -       ");
 }
 
 static void waterMenu_PrintCancel(void)
 {
-	LCD_Print("Cancel         ");
+	LCD_Print("- Cancel -     ");
 }
 
 void (*waterMenu_Print[])(void) =
@@ -84,8 +85,8 @@ void (*waterMenu_Print[])(void) =
 	waterMenu_PrintTime,
 	waterMenu_PrintPeriod,
 	waterMenu_PrintMoisture,
-	waterMenu_PrintTest,
 	waterMenu_PrintSave,
+	waterMenu_PrintTest,
 	waterMenu_PrintCancel
 };
 
@@ -164,7 +165,20 @@ static void waterMenu_Down(void)
  */
 static void waterMenu_Select(void)
 {
+	switch(m_cursorField)
+	{
+		case CURSOR_FIELD_TIME:
+			break;
 
+		case CURSOR_FIELD_PERIOD:
+			break;
+
+		case CURSOR_FIELD_MOISTURE:
+			break;
+
+		default:
+			break;
+	}
 }
 
 /**
@@ -172,8 +186,78 @@ static void waterMenu_Select(void)
  */
 static void waterMenu_Left(void)
 {
+	switch(m_cursorField)
+	{
+		case CURSOR_FIELD_TIME:
+			if( m_newWaterTime.RTC_Minutes >= WATER_MENU_TIME_STEP )
+			{
+				m_newWaterTime.RTC_Minutes -= WATER_MENU_TIME_STEP;
+			}
+			else
+			{
+				m_newWaterTime.RTC_Minutes += (60 - WATER_MENU_TIME_STEP);
 
+				if( m_newWaterTime.RTC_Hours > 0 )
+					m_newWaterTime.RTC_Hours--;
+				else
+					m_newWaterTime.RTC_Hours = 23;
+			}
+
+			break;
+
+		case CURSOR_FIELD_PERIOD:
+			if( m_period > 0 ) m_period --;
+			break;
+
+		case CURSOR_FIELD_MOISTURE:
+			if( m_moisture >= 10 )
+				m_moisture -= 10;
+			else
+				m_moisture = 0;
+			break;
+
+		default:
+			break;
+	}
+
+	waterMenu_Show();
 }
+
+/**
+ *
+ */
+static void waterMenu_Right(void)
+{
+	switch(m_cursorField)
+	{
+		case CURSOR_FIELD_TIME:
+			m_newWaterTime.RTC_Minutes += WATER_MENU_TIME_STEP;
+
+			if( m_newWaterTime.RTC_Minutes >=60 )
+			{
+				m_newWaterTime.RTC_Minutes -= 60;
+				m_newWaterTime.RTC_Hours++;
+				if( m_newWaterTime.RTC_Hours == 24 ) m_newWaterTime.RTC_Hours = 0;
+			}
+
+			break;
+
+		case CURSOR_FIELD_PERIOD:
+			if( m_period < 300 ) m_period ++;
+			break;
+
+		case CURSOR_FIELD_MOISTURE:
+			if( m_moisture < 250 )
+				m_moisture += 10;
+			break;
+
+		default:
+			break;
+	}
+
+	waterMenu_Show();
+}
+
 
 Menu_t waterMenu =
 {
@@ -182,7 +266,7 @@ Menu_t waterMenu =
 	.redraw = NULL,
 	.up = waterMenu_Up,
 	.down = waterMenu_Down,
-	.right = NULL,
+	.right = waterMenu_Right,
 	.left = waterMenu_Left,
 	.select = waterMenu_Select,
 };
