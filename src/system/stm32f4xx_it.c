@@ -32,6 +32,7 @@
 #include "stm32f4xx_it.h"
 #include "debug.h"
 #include "command.h"
+#include "menu.h"
 
 /** @addtogroup Template_Project
   * @{
@@ -194,8 +195,30 @@ void EXTI0_IRQHandler(void)
 	{
 		/* Clear EXTI line0 pending bit */
 		EXTI_ClearITPendingBit(EXTI_Line0);
+		MENU_SetWakeupEvent(MENU_WAKEUP_KEYPAD);
 	}
 }
+
+/**
+ * @brief IRQ handler of RTC alarm
+ */
+void RTC_Alarm_IRQHandler(void)
+{
+	if ( EXTI_GetITStatus(EXTI_Line17) )
+	{
+		/* Clear EXTI line17 pending bit */
+		EXTI_ClearITPendingBit(EXTI_Line17);
+
+		if (RTC_GetITStatus(RTC_IT_ALRA) != RESET)
+		{
+			/* Clear the Alarm A Pending Bit */
+			RTC_ClearITPendingBit(RTC_IT_ALRA);
+
+			MENU_SetWakeupEvent(MENU_WAKEUP_ALARM);
+		}
+	}
+}
+
 
 
 /**

@@ -147,6 +147,9 @@ static const CLI_Command_Definition_t xWaterOpen =
 };
 #endif
 
+/**
+ * @brief	Request a watering process
+ */
 void WATER_SendRequest(void)
 {
 	xTaskNotifyGive(g_waterTask);

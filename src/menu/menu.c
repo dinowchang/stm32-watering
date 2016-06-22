@@ -16,7 +16,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "menufunc.h"
 #include "keypad.h"
-
+#include "water.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -32,10 +32,24 @@
 
 /* Private variables ---------------------------------------------------------*/
 static Menu_t *m_currentMenu;
+static uint32_t m_wakeupEvent = 0;
 
 /* Private function prototypes -----------------------------------------------*/
 
 /* Private functions ---------------------------------------------------------*/
+
+void MENU_SetWakeupEvent(uint32_t wakeupEvent)
+{
+	m_wakeupEvent |= wakeupEvent;
+}
+
+
+void MENU_ClrWakeupEvent(uint32_t wakeupEvent)
+{
+	taskENTER_CRITICAL();
+	m_wakeupEvent &= ~wakeupEvent;
+	taskEXIT_CRITICAL();
+}
 
 /**
  * @brief	switch menu
@@ -154,6 +168,11 @@ static void MENU_Task( void *pvParameters )
 	{
 
 		// Check watering event
+		if( m_wakeupEvent & MENU_WAKEUP_ALARM)
+		{
+			MENU_ClrWakeupEvent(MENU_WAKEUP_ALARM);
+			WATER_SendRequest();
+		}
 
 		// Check keypad event
 
@@ -184,7 +203,6 @@ static void MENU_Task( void *pvParameters )
 					break;
 				}
 			}
-
 
 			switch(key)
 			{
@@ -225,6 +243,7 @@ static void MENU_Task( void *pvParameters )
 
 		// Enter Sleep mode
 		MENU_Sleep();
+
 	}
 }
 
