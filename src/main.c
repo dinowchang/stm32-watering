@@ -153,7 +153,7 @@ int main(void)
 
 	// Initialize system and drivers
 	DEBUG_Init();
-	Blink_Init();
+	//Blink_Init();
 	COMM_Init();
 	CALENDAR_Init();
 	LCD_Init();

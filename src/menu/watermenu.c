@@ -26,7 +26,7 @@
 #define CURSOR_FIELD_MOISTURE			2
 #define CURSOR_FIELD_SAVE				3
 #define CURSOR_FIELD_TEST				4
-#define CURSOR_FIELD_CANCEL				5
+#define CURSOR_FIELD_BACK				5
 
 #define WATER_MENU_LENGTH				(sizeof(waterMenu_Print) / sizeof(waterMenu_Print[0]))
 #define WATER_MENU_TIME_STEP			20
@@ -39,6 +39,7 @@ static uint8_t m_cursorLine;
 static RTC_TimeTypeDef m_newWaterTime;
 static uint32_t m_period;
 static uint16_t m_moisture;
+static bool m_modified;
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -72,12 +73,16 @@ static void waterMenu_PrintTest(void)
 
 static void waterMenu_PrintSave(void)
 {
-	LCD_Print("- Save -       ");
+	if( m_modified )
+		LCD_Print("- Save -  *    ");
+	else
+		LCD_Print("- Save -       ");
+
 }
 
-static void waterMenu_PrintCancel(void)
+static void waterMenu_PrintBack(void)
 {
-	LCD_Print("- Cancel -     ");
+	LCD_Print("- Back -       ");
 }
 
 void (*waterMenu_Print[])(void) =
@@ -87,7 +92,7 @@ void (*waterMenu_Print[])(void) =
 	waterMenu_PrintMoisture,
 	waterMenu_PrintSave,
 	waterMenu_PrintTest,
-	waterMenu_PrintCancel
+	waterMenu_PrintBack
 };
 
 static void waterMenu_Show(void)
@@ -122,6 +127,7 @@ static void waterMenu_Open(void)
 
 	m_cursorField = 0;
 	m_cursorLine = 0;
+	m_modified = FALSE;
 
 	WATER_GetWaterTime(&m_newWaterTime);
 	m_period = WATER_GetPeriod() / 100;
@@ -167,13 +173,20 @@ static void waterMenu_Select(void)
 {
 	switch(m_cursorField)
 	{
-		case CURSOR_FIELD_TIME:
+		case  CURSOR_FIELD_SAVE:
+			WATER_SetWaterTime(&m_newWaterTime);
+			WATER_SetPeriod(m_period * 100);
+			WATER_SetThreshold(m_moisture);
+
+			m_modified = FALSE;
+			waterMenu_Show();
 			break;
 
-		case CURSOR_FIELD_PERIOD:
+		case  CURSOR_FIELD_TEST:
 			break;
 
-		case CURSOR_FIELD_MOISTURE:
+		case  CURSOR_FIELD_BACK:
+			MENU_SwitchMenu(&mainMenu);
 			break;
 
 		default:
@@ -189,6 +202,8 @@ static void waterMenu_Left(void)
 	switch(m_cursorField)
 	{
 		case CURSOR_FIELD_TIME:
+			m_modified = TRUE;
+
 			if( m_newWaterTime.RTC_Minutes >= WATER_MENU_TIME_STEP )
 			{
 				m_newWaterTime.RTC_Minutes -= WATER_MENU_TIME_STEP;
@@ -206,10 +221,14 @@ static void waterMenu_Left(void)
 			break;
 
 		case CURSOR_FIELD_PERIOD:
+			m_modified = TRUE;
+
 			if( m_period > 0 ) m_period --;
 			break;
 
 		case CURSOR_FIELD_MOISTURE:
+			m_modified = TRUE;
+
 			if( m_moisture >= 10 )
 				m_moisture -= 10;
 			else
@@ -231,6 +250,8 @@ static void waterMenu_Right(void)
 	switch(m_cursorField)
 	{
 		case CURSOR_FIELD_TIME:
+			m_modified = TRUE;
+
 			m_newWaterTime.RTC_Minutes += WATER_MENU_TIME_STEP;
 
 			if( m_newWaterTime.RTC_Minutes >=60 )
@@ -243,12 +264,22 @@ static void waterMenu_Right(void)
 			break;
 
 		case CURSOR_FIELD_PERIOD:
+			m_modified = TRUE;
+
 			if( m_period < 300 ) m_period ++;
 			break;
 
 		case CURSOR_FIELD_MOISTURE:
+			m_modified = TRUE;
+
 			if( m_moisture < 250 )
 				m_moisture += 10;
+			break;
+
+		case  CURSOR_FIELD_SAVE:
+		case  CURSOR_FIELD_TEST:
+		case  CURSOR_FIELD_BACK:
+			waterMenu_Select();
 			break;
 
 		default:
