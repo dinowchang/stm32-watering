@@ -153,7 +153,7 @@ int main(void)
 
 	// Initialize system and drivers
 	DEBUG_Init();
-	Blink_Init();
+	//Blink_Init();
 	COMM_Init();
 	CALENDAR_Init();
 	LCD_Init();
@@ -200,6 +200,25 @@ void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 
 	( void ) pxTask;
 	( void ) pcTaskName;
+
+	char *ptr;
+	char msg[] = " stack overflow !!!!\n";
+
+	ptr = pcTaskName;
+
+	while( *ptr != '\0')
+	{
+		DEBUG_SendData(*ptr);
+		ptr++;
+	}
+
+	ptr = msg;
+
+	while( *ptr != '\0')
+	{
+		DEBUG_SendData(*ptr);
+		ptr++;
+	}
 
 	for( ;; );
 }

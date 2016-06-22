@@ -33,10 +33,9 @@ typedef struct
 static MainMenuItem_t m_menuList[] =
 {
 		{ "-- Main Menu --", NULL},
-		{ " Watering set  ", NULL},
+		{ " Watering set  ", &waterMenu},
 		{ " Moist. mon    ", &moistureMenu},
 		{ " Clock         ", &clockMenu},
-		{ " Test func.    ", NULL},
 		{ "---   End   ---", NULL}
 };
 
