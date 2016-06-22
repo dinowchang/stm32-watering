@@ -28,6 +28,8 @@
 #define CURSOR_FIELD_SAVE				4
 #define CURSOR_FIELD_CANCEL				5
 
+#define WATER_MENU_LENGTH				(sizeof(waterMenu_Print) / sizeof(waterMenu_Print[0]))
+
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
@@ -51,16 +53,41 @@ static void waterMenu_PrintTime(void)
 static void waterMenu_PrintPeriod(void)
 {
 	char buf[17];
-	sprintf(buf, "Period(s) %2ld.%1ld", (m_period / 10), (m_period % 10));
+	sprintf(buf, "Period(s)  %2ld.%1ld", (m_period / 10), (m_period % 10));
 	LCD_Print(buf);
+}
+
+static void waterMenu_PrintMoisture(void)
+{
+	char buf[17];
+	sprintf(buf, "Moisture   %4d", m_moisture);
+	LCD_Print(buf);
+}
+
+static void waterMenu_PrintTest(void)
+{
+	LCD_Print("Test           ");
+}
+
+static void waterMenu_PrintSave(void)
+{
+	LCD_Print("Save           ");
+}
+
+static void waterMenu_PrintCancel(void)
+{
+	LCD_Print("Cancel         ");
 }
 
 void (*waterMenu_Print[])(void) =
 {
 	waterMenu_PrintTime,
 	waterMenu_PrintPeriod,
+	waterMenu_PrintMoisture,
+	waterMenu_PrintTest,
+	waterMenu_PrintSave,
+	waterMenu_PrintCancel
 };
-
 
 static void waterMenu_Show(void)
 {
@@ -109,7 +136,13 @@ static void waterMenu_Open(void)
  */
 static void waterMenu_Up(void)
 {
+	if( m_cursorLine > 0 )
+		m_cursorLine--;
 
+	if( m_cursorField > CURSOR_FIELD_TIME )
+			m_cursorField--;
+
+	waterMenu_Show();
 }
 
 /**
@@ -117,7 +150,13 @@ static void waterMenu_Up(void)
  */
 static void waterMenu_Down(void)
 {
+	if( m_cursorLine < 1 )
+		m_cursorLine++;
 
+	if( m_cursorField < (WATER_MENU_LENGTH - 1) )
+			m_cursorField++;
+
+	waterMenu_Show();
 }
 
 /**
@@ -143,7 +182,7 @@ Menu_t waterMenu =
 	.redraw = NULL,
 	.up = waterMenu_Up,
 	.down = waterMenu_Down,
-	.right = waterMenu_Select,
+	.right = NULL,
 	.left = waterMenu_Left,
 	.select = waterMenu_Select,
 };
