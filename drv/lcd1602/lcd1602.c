@@ -317,15 +317,16 @@ void LCD_Sleep(FunctionalState newState)
 	if( newState != DISABLE )
 	{
 		LCD_Display(DISABLE);
-		GPIO_ResetBits(LCD_PIN_PW);
-		GPIO_SetBits(LCD_PIN_PW);
+		GPIO_ResetBits(LCD_PIN_BL);
 
+		GPIO_SetBits(LCD_PIN_PW);
 	}
 	else
 	{
 		GPIO_ResetBits(LCD_PIN_PW);
 		LCD_PowerOnFlow();
-		GPIO_ResetBits(LCD_PIN_PW);
+
+		GPIO_SetBits(LCD_PIN_BL);
 		LCD_Display(ENABLE);
 	}
 }
