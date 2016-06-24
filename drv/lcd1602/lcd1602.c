@@ -44,6 +44,8 @@
 #define LCD_PIN_EN_NUM						GPIO_Pin_7
 #define LCD_PIN_BL_PORT						GPIOB
 #define LCD_PIN_BL_NUM						GPIO_Pin_6
+#define LCD_PIN_PW_PORT						GPIOB
+#define LCD_PIN_PW_NUM						GPIO_Pin_7
 
 #define LCD_PIN_DB4							LCD_PIN_DB4_PORT, LCD_PIN_DB4_NUM
 #define LCD_PIN_DB5							LCD_PIN_DB5_PORT, LCD_PIN_DB5_NUM
@@ -52,6 +54,7 @@
 #define LCD_PIN_RS							LCD_PIN_RS_PORT, LCD_PIN_RS_NUM
 #define LCD_PIN_EN							LCD_PIN_EN_PORT, LCD_PIN_EN_NUM
 #define LCD_PIN_BL							LCD_PIN_BL_PORT, LCD_PIN_BL_NUM
+#define LCD_PIN_PW							LCD_PIN_PW_PORT, LCD_PIN_PW_NUM
 
 // HD44780 Commands
 #define HD44780_CLEAR						0x01
@@ -272,17 +275,6 @@ void LCD_Print(char *str)
 	while(*str) LCD_WriteData(*str++);
 }
 
-
-/**
- * @brief	Control backlight and display on/off
- * @param	newState
- */
-void LCD_Sleep(FunctionalState newState)
-{
-	LCD_Display(!newState);
-	GPIO_WriteBit(LCD_PIN_BL, (BitAction)(!newState));
-}
-
 /**
  * @brief Configure flow of 4bits mode after power on
  */
@@ -296,6 +288,47 @@ static void LCD_SetTo4BitsMode(void)
 	udelay(LCD_INSTRUCTION_DELAY);
 	LCD_WriteNibble(0x02);
 	udelay(LCD_INSTRUCTION_DELAY);
+}
+
+/**
+ * @brief	Initialize flow after power on
+ */
+void LCD_PowerOnFlow(void)
+{
+	udelay(40000);
+
+	m_EntryMode = HD44780_ENTRY_MODE;
+	m_DisplayCtl = HD44780_DISPLAY_CONTROL;
+
+	LCD_SetTo4BitsMode();
+	LCD_WriteInstruction(HD44780_FUNCTION_SET | HD44780_TWO_LINE); // set LCD to font 5x7, 2 line
+	LCD_Display(DISABLE);
+	LCD_Clear();
+	LCD_LeftToRightMode(ENABLE);
+	LCD_Display(ENABLE);
+}
+
+/**
+ * @brief	Control backlight and display on/off
+ * @param	newState
+ */
+void LCD_Sleep(FunctionalState newState)
+{
+	if( newState != DISABLE )
+	{
+		LCD_Display(DISABLE);
+		GPIO_ResetBits(LCD_PIN_BL);
+
+		GPIO_SetBits(LCD_PIN_PW);
+	}
+	else
+	{
+		GPIO_ResetBits(LCD_PIN_PW);
+		LCD_PowerOnFlow();
+
+		GPIO_SetBits(LCD_PIN_BL);
+		LCD_Display(ENABLE);
+	}
 }
 
 /**
@@ -326,20 +359,15 @@ void LCD_Init(void)
 	GPIO_Init(LCD_PIN_EN_PORT, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = LCD_PIN_BL_NUM;
 	GPIO_Init(LCD_PIN_BL_PORT, &GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = LCD_PIN_PW_NUM;
+	GPIO_Init(LCD_PIN_PW_PORT, &GPIO_InitStructure);
 
+	GPIO_ResetBits(LCD_PIN_PW);
 	GPIO_ResetBits(LCD_PIN_RS);
 	GPIO_ResetBits(LCD_PIN_EN);
 	GPIO_SetBits(LCD_PIN_BL);
 
-	m_EntryMode = HD44780_ENTRY_MODE;
-	m_DisplayCtl = HD44780_DISPLAY_CONTROL;
-
-	LCD_SetTo4BitsMode();
-	LCD_WriteInstruction(HD44780_FUNCTION_SET | HD44780_TWO_LINE); // set LCD to font 5x7, 2 line
-	LCD_Display(DISABLE);
-	LCD_Clear();
-	LCD_LeftToRightMode(ENABLE);
-	LCD_Display(ENABLE);
+	LCD_PowerOnFlow();
 
 #if SUPPORT_LCD_TEST_COMMAND
 	LCD_Test();
