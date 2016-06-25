@@ -320,14 +320,59 @@ void LCD_Sleep(FunctionalState newState)
 		GPIO_ResetBits(LCD_PIN_BL);
 
 		GPIO_SetBits(LCD_PIN_PW);
+
+		// Set all gpio to input mode for power consumption
+		GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_StructInit(&GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB4_NUM;
+		GPIO_Init(LCD_PIN_DB4_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB5_NUM;
+		GPIO_Init(LCD_PIN_DB5_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB6_NUM;
+		GPIO_Init(LCD_PIN_DB6_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB7_NUM;
+		GPIO_Init(LCD_PIN_DB7_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_RS_NUM;
+		GPIO_Init(LCD_PIN_RS_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_EN_NUM;
+		GPIO_Init(LCD_PIN_EN_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_BL_NUM;
+		GPIO_Init(LCD_PIN_BL_PORT, &GPIO_InitStructure);
+
 	}
 	else
 	{
-		GPIO_ResetBits(LCD_PIN_PW);
-		LCD_PowerOnFlow();
+		GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_StructInit(&GPIO_InitStructure);
 
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB4_NUM;
+		GPIO_Init(LCD_PIN_DB4_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB5_NUM;
+		GPIO_Init(LCD_PIN_DB5_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB6_NUM;
+		GPIO_Init(LCD_PIN_DB6_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB7_NUM;
+		GPIO_Init(LCD_PIN_DB7_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_RS_NUM;
+		GPIO_Init(LCD_PIN_RS_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_EN_NUM;
+		GPIO_Init(LCD_PIN_EN_PORT, &GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Pin = LCD_PIN_BL_NUM;
+		GPIO_Init(LCD_PIN_BL_PORT, &GPIO_InitStructure);
+
+		GPIO_ResetBits(LCD_PIN_RS);
+		GPIO_ResetBits(LCD_PIN_EN);
 		GPIO_SetBits(LCD_PIN_BL);
-		LCD_Display(ENABLE);
+
+		GPIO_ResetBits(LCD_PIN_PW);
+		GPIO_SetBits(LCD_PIN_BL);
+		LCD_PowerOnFlow();
 	}
 }
 
