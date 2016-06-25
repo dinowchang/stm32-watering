@@ -21,7 +21,10 @@
 /* Exported types ------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
-#define DEBUG_PORT				DEBUG_PORT_USART2	///<  DEBUG_PORT could be set either to DEBUG_PORT_USART2 or DEBUG_PORT_USART3
+#define DEBUG_PORT				DEBUG_PORT_USART2	///<  DEBUG_PORT
+#define DEBUG_PORT_NONE			0
+#define DEBUG_PORT_USART2		2
+#define DEBUG_PORT_USART3		3
 
 #define DEBUG
 #define TEST_USART_RX_ECHO		0
