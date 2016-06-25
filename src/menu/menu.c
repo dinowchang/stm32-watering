@@ -125,13 +125,13 @@ Key_t MENU_GetNewKey(int16_t timeout)
 
 void MENU_Sleep(void)
 {
-	DEBUG_SleepMode(ENABLE);
-
 	RTC_TimeTypeDef RTC_SleepTime, RTC_WakeupTime;
 	RTC_GetTime(RTC_Format_BIN, &RTC_SleepTime);
 
 	// Disable systick interrupt to prevent that wake up immediately
 	SysTick->CTRL &= ~SysTick_CTRL_TICKINT_Msk;
+
+	DEBUG_SleepMode(ENABLE);
 
 	// Enter stop mode
 	PWR_EnterSTOPMode(PWR_MainRegulator_ON, PWR_STOPEntry_WFI);
@@ -140,12 +140,12 @@ void MENU_Sleep(void)
 	extern void ResetSysClock(void);
 	ResetSysClock();
 
+	DEBUG_SleepMode(DISABLE);
+
 	// Enable systick interrupt
 	SysTick->CTRL |= SysTick_CTRL_TICKINT_Msk;
 
 	RTC_GetTime(RTC_Format_BIN, &RTC_WakeupTime);
-
-	DEBUG_SleepMode(DISABLE);
 
 	DEBUG_printf(DBG_MENU, "Sleep @ %02d:%02d:%02d, Wake up @ %02d:%02d:%02d\n",
 			RTC_SleepTime.RTC_Hours, RTC_SleepTime.RTC_Minutes,

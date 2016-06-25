@@ -344,6 +344,7 @@ void LCD_Sleep(FunctionalState newState)
 	}
 	else
 	{
+		// Re-configure all gpio
 		GPIO_InitTypeDef GPIO_InitStructure;
 		GPIO_StructInit(&GPIO_InitStructure);
 
