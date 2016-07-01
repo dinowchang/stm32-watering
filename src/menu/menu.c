@@ -263,7 +263,9 @@ static void MENU_Task( void *pvParameters )
 		// Enter Sleep mode
 		if( WATER_Lock() )
 		{
+#if SUPPORT_STOP_MODE
 			MENU_Sleep();
+#endif
 			WATER_Unlock();
 		}
 		else
