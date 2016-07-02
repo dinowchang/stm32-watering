@@ -47,6 +47,7 @@
 /* Exported functions ------------------------------------------------------- */
 void DEBUG_Init(void);
 void DEBUG_SendData(uint16_t Data);
+void DEBUG_SleepMode(FunctionalState newState);
 extern SemaphoreHandle_t xPrintMutex;
 
 #endif /* __DEBUG_H_ */
