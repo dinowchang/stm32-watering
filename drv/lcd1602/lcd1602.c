@@ -321,9 +321,10 @@ void LCD_Sleep(FunctionalState newState)
 
 		GPIO_SetBits(LCD_PIN_PW);
 
-		// Set all gpio to input mode for power consumption
+		// Set all gpio to analog mode for power consumption
 		GPIO_InitTypeDef GPIO_InitStructure;
 		GPIO_StructInit(&GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 		GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 
 		GPIO_InitStructure.GPIO_Pin = LCD_PIN_DB4_NUM;
