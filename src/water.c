@@ -186,6 +186,8 @@ static void WATER_Task( void *pvParameters )
 		SOIL_Open();
 		vTaskDelay(100 / portTICK_PERIOD_MS); // wait sensor stable
 		moisture = SOIL_Read();
+		vTaskDelay(100 / portTICK_PERIOD_MS); // wait sensor stable
+		moisture = SOIL_Read();
 		SOIL_Close();
 
 		if( moisture < m_moistureThreshold)

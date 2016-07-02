@@ -41,10 +41,12 @@ void moistMenu_Open(void)
 
 	SOIL_Open();
 	vTaskDelay(100 / portTICK_PERIOD_MS); // wait sensor stable
+	data = SOIL_Read();
+	vTaskDelay(100 / portTICK_PERIOD_MS); // wait sensor stable
+	data = SOIL_Read();
 
 	m_liveCnt = 0;
 	m_lastUpdateTime = (int32_t) xTaskGetTickCount();
-	data = SOIL_Read();
 
 	LCD_Display(DISABLE);
 	LCD_Blink(DISABLE);
