@@ -61,6 +61,8 @@ void SOIL_Open(void)
 	GPIO_SetBits(SOIL_PIN_VCC_PORT, SOIL_PIN_VCC_NUM);
 
 	// configure ADC channel
+	RCC_APB2PeriphClockCmd(SOIL_ADC_CLOCK_PORT, ENABLE);
+
 	ADC_InitTypeDef ADC_InitStruct;
 	ADC_StructInit(&ADC_InitStruct);
 	ADC_InitStruct.ADC_Resolution = ADC_Resolution_8b;
@@ -107,6 +109,7 @@ void SOIL_Close(void)
 	GPIO_Init(SOIL_PIN_VCC_PORT, &GPIO_InitStructure);
 
 	ADC_Cmd(SOIL_ADC_PORT, DISABLE);
+	RCC_APB2PeriphClockCmd(SOIL_ADC_CLOCK_PORT, DISABLE);
 
 	m_SensorEnabled = FALSE;
 }

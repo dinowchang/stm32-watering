@@ -177,15 +177,12 @@ void DEBUG_DisableUsart2(void)
 	// Disable clock of USART2
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, DISABLE);
 
-	// Configure pins PA2 and PA3 to input mode
+	// Configure pins PA2 and PA3 to analog input mode
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 #endif

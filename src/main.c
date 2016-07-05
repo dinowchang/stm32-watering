@@ -142,6 +142,44 @@ void ResetSysClock(void)
 }
 
 /**
+ * @brief configure all unused pins to analog mode
+ */
+void ConfigureUnusedPins(void)
+{
+	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB |
+			RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+	// PA5, PA6, PA7, PA10, PA11, PA12, PA15
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7 |
+			GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_15;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	// PB1, PB2, PB3, PB8, PB9, PB12, PB13, PB14, PB15
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 |
+			GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_12 | GPIO_Pin_13 |
+			GPIO_Pin_14 | GPIO_Pin_15 ;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	// PC0, PC1, PC2, PC3, PC4, PC8, PC9, PC10, PC11, PC12, PC14, PC15
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 |GPIO_Pin_1 | GPIO_Pin_2 |
+			GPIO_Pin_3 |GPIO_Pin_4 | GPIO_Pin_8 | GPIO_Pin_9 |
+			GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_14 |
+			GPIO_Pin_15;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+	// PD2
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+}
+
+/**
   * @brief  Main program
   * @param  None
   * @retval None
@@ -150,6 +188,8 @@ int main(void)
 {
 	// Initialize system
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+	ConfigureUnusedPins();
 
 	// Initialize system and drivers
 	DEBUG_Init();
