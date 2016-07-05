@@ -109,6 +109,8 @@ void KEY_SetIntrMode(FunctionalState newState)
 
 	if( newState != DISABLE )
 	{
+		KEY_Disable();
+
 		// Configure key pin to digital input
 		GPIO_InitStructure.GPIO_Pin = KEY_PIN_NUM;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -128,9 +130,13 @@ void KEY_SetIntrMode(FunctionalState newState)
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 		NVIC_Init(&NVIC_InitStructure);
+
+		RCC_APB2PeriphClockCmd(KEY_ADC_CLOCK_PORT, DISABLE);
 	}
 	else
 	{
+		RCC_APB2PeriphClockCmd(KEY_ADC_CLOCK_PORT, ENABLE);
+
 		EXTI_InitStruct.EXTI_Line = KEY_PIN_EXPI_LINE;
 		EXTI_InitStruct.EXTI_LineCmd = DISABLE;
 		EXTI_Init(&EXTI_InitStruct);
